@@ -11,22 +11,22 @@ screen = pygame.display.set_mode((800,600))
 
 # background image
   # this image is too big pixel wise
-background = pygame.image.load("C:\\Users\\canyon.white\\PycharmProjects\\group9pygame\\assets\\background.jpg")
+background = pygame.image.load("assets\\background.jpg")
 
 # Title Caption and Icon
 pygame.display.set_caption("Group 9 Project")
-icon = pygame.image.load("C:\\Users\\canyon.white\\PycharmProjects\\group9pygame\\assets\\game_icon.png")
+icon = pygame.image.load("assets\\game_icon.png")
 pygame.display.set_icon(icon)
 
 # Player
-playerImg = pygame.image.load("C:\\Users\\canyon.white\\PycharmProjects\\group9pygame\\assets\\plane.png")
+playerImg = pygame.image.load("assets\\plane.png")
 # to get player to starting point, coordinates below
 playerX = 370
 playerY = 480
 playerX_change = 0
 
 # Enemy
-enemyImg = pygame.image.load("C:\\Users\\canyon.white\\PycharmProjects\\group9pygame\\assets\\nuclear-bomb.png")
+enemyImg = pygame.image.load("assets\\nuclear-bomb.png")
 # this makes the enemy appear randomly within these parameters
 enemyX = random.randint(0,800)
 enemyY = random.randint(50,150)
@@ -34,7 +34,7 @@ enemyX_change = 0.1
 enemyY_change = 40
 
 # Bullet/Missle
-bulletImg = pygame.image.load("C:\\Users\\canyon.white\\PycharmProjects\\group9pygame\\assets\\bullet.png")
+bulletImg = pygame.image.load("assets\\game_icon.png")
 # this makes the enemy appear randomly within these parameters
 bulletX = 0
 bulletY = 480
