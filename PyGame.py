@@ -1,6 +1,4 @@
-import pygame 
-import random
-import sys
+import pygame,random,sys
 
 # Intialize the pygame
 pygame.init()
@@ -23,6 +21,7 @@ playerImg = pygame.image.load("assets\\plane.png")
 playerRect = playerImg.get_rect(center=(370,480))
 # to get player to starting point, coordinates below
 
+
 # Enemy
 enemyImg = pygame.image.load("assets\\nuclear-bomb.png")
 # this makes the enemy appear randomly within these parameters
@@ -33,12 +32,11 @@ enemyRect = enemyImg.get_rect(center=(enemyX, enemyY))
 directions = [True, False]
 enemyDir = random.choice(directions)
 
+
 # Bullet/Missle
 bulletImg = pygame.image.load("assets\\bullet.png")
 bulletRect = bulletImg.get_rect(center=(0,700))
-
-# Ready - you cant see bullet on screen
-# Fire - bullet is moving
+# Fire - bullet is moving, Ready - you cant see bullet on screen
 bullet_state = "ready"
 
 def get_enemy_coords():
@@ -51,9 +49,9 @@ def move_entities():
     global playerRect, bulletRect, enemyRect, enemyDir
 
     if keys[pygame.K_d]:
-        playerRect = playerRect.move(5,0)
+        playerRect = playerRect.move(8,0)
     if keys[pygame.K_a]:
-        playerRect = playerRect.move(-5,0)
+        playerRect = playerRect.move(-8,0)
     
     if not enemyDir:
         enemyRect = enemyRect.move(-5,0)
@@ -68,7 +66,7 @@ def move_entities():
 
 def fire_bullet():
     global bulletRect
-    bulletRect = bulletRect.move(0,-5) 
+    bulletRect = bulletRect.move(0,-8) 
 
 # Game Loop
 running = True
@@ -115,5 +113,5 @@ while running:
 
     # calling the plane/enemy ONTO the screen
     move_entities()
-    pygame.display.update()
+    pygame.display.flip()
     clock.tick(60)
