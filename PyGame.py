@@ -7,6 +7,7 @@ pygame.init()
 
 # create the screen, width/height
 screen = pygame.display.set_mode((800,600))
+clock = pygame.time.Clock()
 
 # background image
   # this image is too big pixel wise
@@ -25,10 +26,12 @@ playerRect = playerImg.get_rect(center=(370,480))
 # Enemy
 enemyImg = pygame.image.load("assets\\nuclear-bomb.png")
 # this makes the enemy appear randomly within these parameters
-enemyX = random.randint(0,800)
+enemyX = random.randint(0,736)
 enemyY = random.randint(50,150)
-enemyX_change = 0.1
-enemyY_change = 40
+enemyRect = enemyImg.get_rect(center=(enemyX, enemyY))
+# false = left, true = right
+directions = [True, False]
+enemyDir = random.choice(directions)
 
 # Bullet/Missle
 bulletImg = pygame.image.load("assets\\bullet.png")
@@ -38,26 +41,35 @@ bulletRect = bulletImg.get_rect(center=(0,700))
 # Fire - bullet is moving
 bullet_state = "ready"
 
+def get_enemy_coords():
+    global enemyRect, enemyX, enemyY, enemyDir
+    enemyDir = random.choice(directions)
+    enemyRect.x = enemyX
+    enemyRect.y = enemyY
+
 def move_entities():
-    global playerRect
-    global bulletRect
+    global playerRect, bulletRect, enemyRect, enemyDir
+
     if keys[pygame.K_d]:
         playerRect = playerRect.move(5,0)
     if keys[pygame.K_a]:
         playerRect = playerRect.move(-5,0)
-
-def enemy(x,y):
-    #drawing the enemy (bomb) onto the screen
-    screen.blit(enemyImg,(x,y))
+    
+    if not enemyDir:
+        enemyRect = enemyRect.move(-5,0)
+    if enemyDir:
+        enemyRect = enemyRect.move(5,0)
+    if enemyRect.x < 0 and not enemyDir:
+        enemyRect.y += 40
+        enemyDir = True
+    if enemyRect.x > 736 and enemyDir:
+        enemyRect.y += 40
+        enemyDir = False
 
 def fire_bullet():
     global bulletRect
     bulletRect = bulletRect.move(0,-5) 
 
-def isCollision(enemyX,enemyY,bulletX,bulletY):
-    pass
-
-clock = pygame.time.Clock()
 # Game Loop
 running = True
 while running:
@@ -67,6 +79,7 @@ while running:
     screen.blit(background,(0,0))
     screen.blit(bulletImg,bulletRect.topleft)
     screen.blit(playerImg,playerRect.topleft)
+    screen.blit(enemyImg, enemyRect.topleft)
 
     keys = pygame.key.get_pressed()
     # every event gets logged below and you loop through each event, like keystrokes
@@ -96,19 +109,11 @@ while running:
         bulletRect.x = 0
     if bulletRect.x >= 750:
         bulletRect.x = 750
-
-    # setting boundaries for the enemy bomb. Enemy bomb pic also 64 pixels
-    enemyX += enemyX_change
-
-    if enemyX <= 0:
-        enemyX_change = 0.1
-        enemyY += enemyY_change
-    elif enemyX >= 736:
-        enemyX_change = -0.1
-        enemyY += enemyY_change
+    
+    if enemyRect.colliderect(bulletRect):
+        get_enemy_coords()
 
     # calling the plane/enemy ONTO the screen
     move_entities()
-    enemy(enemyX,enemyY)
     pygame.display.update()
     clock.tick(60)
