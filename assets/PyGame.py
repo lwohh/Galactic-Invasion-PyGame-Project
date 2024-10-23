@@ -25,13 +25,17 @@ playerRect = playerImg.get_rect(center=(370, 480))
 
 # Enemy
 enemyImg = pygame.image.load("nuclear-bomb.png")
+enemylist = []
 # this makes the enemy appear randomly within these parameters
-enemyX = random.randint(0, 736)
-enemyY = random.randint(50, 150)
-enemyRect = enemyImg.get_rect(center=(enemyX, enemyY))
-# false = left, true = right
-directions = [True, False]
-enemyDir = random.choice(directions)
+for _ in range(5):
+ enemyX = random.randint(0, 736)
+ enemyY = random.randint(50, 150)
+ enemyRect = enemyImg.get_rect(center=(enemyX, enemyY))
+ # false = left, true = right
+ directions = [True, False]
+ enemyDir = random.choice(directions)
+ enemylist.append(enemyRect)
+
 
 # Bullet/Missle
 bulletImg = pygame.image.load("bullet.png")
@@ -133,13 +137,14 @@ while running:
 
 
     # Collision check
-    collision = is_Collision()
-
-    if collision:
-        bulletY = 480
-        bullet_state = "ready"
-        score += 1
-        print(score)
+    for enemyRect in enemylist:
+        if enemyRect.colliderect(bulletRect) and bullet_state == "fire":
+         bulletRect.y = 700
+         bullet_state = "ready"
+         enemyRect.y = random.randint(-100,-50)
+         enemyRect.x = random.randint(0,736)
+         score += 1
+         print("Score:",score)
 
     # calling the plane/enemy ONTO the screen
     move_entities()
