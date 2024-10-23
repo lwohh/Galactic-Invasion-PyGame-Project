@@ -113,13 +113,20 @@ bullet1 = bullet()
 
 
 
-# timed events, enemy spawning, faster spawning, 
+# timed events, enemy spawning, faster spawning
+# creates a custom event
 spawn_event = pygame.event.custom_type()
+# how long between event triggers (in milliseconds, starts at 3.5 seconds)
 spawn_timer = 3500
+# sets the timer for this event
 pygame.time.set_timer(spawn_event, spawn_timer)
 
+
+# creates a new custom event
 faster_timer_event = pygame.event.custom_type()
+# time between event triggers (10 seconds)
 timer_event_timer = 10000
+# sets the timer for this event
 pygame.time.set_timer(faster_timer_event, timer_event_timer)
 
 
@@ -139,29 +146,44 @@ while running:
             sys.exit(0)
         if keys[pygame.K_ESCAPE]:
             sys.exit(0)
+
+
+        # every 3.5 seconds a new enemy spawns on the event trigger
         if event.type == spawn_event:
             sprite_group.add(Enemy())
+            # debug code, will only go off when event is triggered
             print("new enemy")
+
+
+        # every 10 seconds the spawn timer will go down 0.2 seconds or 200 milliseconds
         if event.type == faster_timer_event:
             spawn_timer -= 200
+            # debug code
             print("spawning faster")
+        
+        # checks for spacebar pressed, if bullet is ready to be fired, will add bullet1 to the bullet group
         if keys[pygame.K_SPACE] and bullet1.state == "ready":
             bullet1.state = "fire"
             bullet_group.add(bullet1)
             bullet1.rect.x = player.rect.x + 16
             bullet1.rect.y = player.rect.y
-            
+    
+    # when the bullet goes out of bounds, state changes to ready and can be fired again
     if bullet1.rect.y < -32:
         bullet1.state = "ready"    
     
+    # checks if anything in bullet group collides with enemies, if so the enemy is deleted from the group and the bullet remains
     pygame.sprite.groupcollide(bullet_group, sprite_group, False, True)
 
+    # .draw is the same as blitting, draws everything in the groups to the screen and activates the update() methods on each group
     sprite_group.draw(screen)
     sprite_group.update()
     bullet_group.draw(screen)
     bullet_group.update()
     player_group.draw(screen)
     player_group.update()
-        # calling the plane/enemy ONTO the screen
+
+
+    # refreshes the screen and keeps the fps at 60
     pygame.display.flip()
     clock.tick(60)
