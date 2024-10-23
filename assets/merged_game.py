@@ -1,15 +1,22 @@
 import pygame,random,sys
 
+
+
 # Intialize the pygame
 pygame.init()
+
+
 
 # create the screen, width/height
 screen = pygame.display.set_mode((800,600))
 clock = pygame.time.Clock()
 
+
+
 # background image
-  # this image is too big pixel wise
 background = pygame.image.load("background.jpg")
+
+
 
 # Title Caption and Icon
 pygame.display.set_caption("Group 9 Project")
@@ -17,7 +24,10 @@ icon = pygame.image.load("game_icon.png")
 pygame.display.set_icon(icon)
 
 
+
+# enemy class
 class Enemy(pygame.sprite.Sprite):
+    # initializes the class, and info for all new objects
     def __init__(self):
         super().__init__()
         self.speed = 8
@@ -30,11 +40,15 @@ class Enemy(pygame.sprite.Sprite):
         self.directions = [True, False]
         self.dir = random.choice(self.directions)
     
+    # enemy movement method
     def update(self):
+        # moves enemy left and right depending on random direction from self.dir
         if not self.dir:
             self.rect.x -= self.speed
         if self.dir:
             self.rect.x += self.speed
+        
+        # keeps enemy within bounds 
         if self.rect.x < 0 and not self.dir:
             self.rect.y += 40
             self.dir = True
@@ -42,7 +56,9 @@ class Enemy(pygame.sprite.Sprite):
             self.rect.y += 40
             self.dir = False
 
+# bullet class
 class bullet(pygame.sprite.Sprite):
+    # initializes bullet class and variables for all bullet objects
     def __init__(self):
         super().__init__()
         self.speed = 8
@@ -53,11 +69,14 @@ class bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(self.x,self.y))
         self.state = "ready"
     
+    # bullet movement method
     def update(self):
         if self.state == "fire":
             self.rect.y -= self.speed
 
+# player class 
 class player(pygame.sprite.Sprite):
+    # same as other two classes
     def __init__(self):
         super().__init__()
         self.speed = 10
@@ -65,15 +84,21 @@ class player(pygame.sprite.Sprite):
         self.image = pygame.image.load("plane.png")
         self.rect = self.image.get_rect(center=(370,480))
     
+    # player movement method
     def update(self):
+        # checks if movement keys have been pressed
         if keys[pygame.K_d]:
             self.rect.x += self.speed
         if keys[pygame.K_a]:
             self.rect.x -= self.speed
+
+        # keeps player in bounds
         if self.rect.x < 0:
             self.rect.x = 0
         if self.rect.x > 736:
             self.rect.x = 736
+
+
 
 # sprite groups from classes, enemy, player, bullet
 sprite_group = pygame.sprite.Group()
@@ -87,6 +112,7 @@ bullet_group = pygame.sprite.Group()
 bullet1 = bullet()
 
 
+
 # timed events, enemy spawning, faster spawning, 
 spawn_event = pygame.event.custom_type()
 spawn_timer = 3500
@@ -95,6 +121,8 @@ pygame.time.set_timer(spawn_event, spawn_timer)
 faster_timer_event = pygame.event.custom_type()
 timer_event_timer = 10000
 pygame.time.set_timer(faster_timer_event, timer_event_timer)
+
+
 
 # Game Loop
 running = True
@@ -117,8 +145,6 @@ while running:
         if event.type == faster_timer_event:
             spawn_timer -= 200
             print("spawning faster")
-        if event.type == faster_enemy_event:
-            Enemy.speed += 25
         if keys[pygame.K_SPACE] and bullet1.state == "ready":
             bullet1.state = "fire"
             bullet_group.add(bullet1)
