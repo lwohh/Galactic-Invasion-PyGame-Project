@@ -1,15 +1,18 @@
-import pygame, random, sys,math
+import pygame, random, sys
 
 # Intialize the pygame
 pygame.init()
 
-score = 0
 # create the screen, width/height
 screen = pygame.display.set_mode((800, 600))
 clock = pygame.time.Clock()
 
+
+#define game variables
+rows = 5
+cols = 5
+
 # background image
-# this image is too big pixel wise
 background = pygame.image.load("background.jpg")
 
 # Title Caption and Icon
@@ -17,80 +20,125 @@ pygame.display.set_caption("Group 9 Project")
 icon = pygame.image.load("game_icon.png")
 pygame.display.set_icon(icon)
 
-# Player
-playerImg = pygame.image.load("plane.png")
-playerRect = playerImg.get_rect(center=(370, 480))
-# to get player to starting point, coordinates below
+#define colors
+red = (255,0,0)
+green = (0,255,0)
 
 
-# Enemy
-enemyImg = pygame.image.load("nuclear-bomb.png")
-enemylist = []
-# this makes the enemy appear randomly within these parameters
-for _ in range(5):
- enemyX = random.randint(0, 736)
- enemyY = random.randint(50, 150)
- enemyRect = enemyImg.get_rect(center=(enemyX, enemyY))
- # false = left, true = right
- directions = [True, False]
- enemyDir = random.choice(directions)
- enemylist.append(enemyRect)
+# enemy class
+class Enemy(pygame.sprite.Sprite):
+    # initializes the class, and info for all new objects
+    def __init__(self):
+        super().__init__()
+        self.speed = 8
+        self.name = "enemy"
+        self.damage = 5
+        self.image = pygame.image.load("nuclear-bomb.png")
+        # using list for coords
+        self.pos = [random.randint(0, 736), random.randint(50, 150)]
+        self.rect = self.image.get_rect(center=(self.pos[0], self.pos[1]))
+        self.directions = [True, False]
+        self.dir = random.choice(self.directions)
 
 
-# Bullet/Missle
-bulletImg = pygame.image.load("bullet.png")
-bulletRect = bulletImg.get_rect(center=(0, 700))
-bulletX = 0
-bulletY = 480
-# Fire - bullet is moving, Ready - you cant see bullet on screen
-bullet_state = "ready"
+    def create_aliens(self,enemy):
+        for row in range(rows):
+            for item in range (cols):
+              enemy = Enemy(item * 100)
 
 
-def get_enemy_coords():
-    global enemyRect, enemyX, enemyY, enemyDir
-    enemyDir = random.choice(directions)
-    enemyRect.x = enemyX
-    enemyRect.y = enemyY
+    # enemy movement method
+    def update(self):
+        # moves enemy left and right depending on random direction from self.dir
+        if not self.dir:
+            self.rect.x -= self.speed
+        if self.dir:
+            self.rect.x += self.speed
+
+        # keeps enemy within bounds
+        if self.rect.x < 0 and not self.dir:
+            self.rect.y += 40
+            self.dir = True
+        if self.rect.x > 736 and self.dir:
+            self.rect.y += 40
+            self.dir = False
 
 
-def move_entities():
-    global playerRect, bulletRect, enemyRect, enemyDir
+# bullet class
+class bullet(pygame.sprite.Sprite):
+    # initializes bullet class and variables for all bullet objects
+    def __init__(self):
+        super().__init__()
+        self.speed = 8
+        self.name = "bullet"
+        self.x = 0
+        self.y = 0
+        self.image = pygame.image.load("bullet.png")
+        self.rect = self.image.get_rect(center=(self.x, self.y))
+        self.state = "ready"
 
-    if keys[pygame.K_d]:
-        playerRect = playerRect.move(8, 0)
-    if keys[pygame.K_a]:
-        playerRect = playerRect.move(-8, 0)
-
-    if not enemyDir:
-        enemyRect = enemyRect.move(-5, 0)
-    if enemyDir:
-        enemyRect = enemyRect.move(5, 0)
-    if enemyRect.x < 0 and not enemyDir:
-        enemyRect.y += 40
-        enemyDir = True
-    if enemyRect.x > 736 and enemyDir:
-        enemyRect.y += 40
-        enemyDir = False
-
-
-def fire_bullet():
-    global bulletRect
-    bulletRect = bulletRect.move(0, -8)
+    # bullet movement method
+    def update(self):
+        if self.state == "fire":
+            self.rect.y -= self.speed
 
 
+# player class
+class player(pygame.sprite.Sprite):
+    # same as other two classes
+    def __init__(self,health):
+        super().__init__()
+        self.speed = 10
+        self.name = "player"
+        self.image = pygame.image.load("plane.png")
+        self.rect = self.image.get_rect(center=(370, 480))
+        self.health_start = health
+        self.health_remaining = health
 
-def is_Collision():
-    global enemyX
-    global enemyY
-    global bulletX
-    global bulletY
+    # player movement method
+    def update(self):
+        # checks if movement keys have been pressed
+        if keys[pygame.K_d]:
+            self.rect.x += self.speed
+        if keys[pygame.K_a]:
+            self.rect.x -= self.speed
 
-    distance = math.sqrt((math.pow(enemyX - bulletX, 2)) + (math.pow(enemyY + bulletY,2)))
-    if distance < 130:
-        return True
-    else:
-        return False
+        # keeps player in bounds
+        if self.rect.x < 0:
+            self.rect.x = 0
+        if self.rect.x > 736:
+            self.rect.x = 736
 
+        #draw health bar
+        pygame.draw.rect(screen,red,(self.rect.x,(self.rect.bottom + 10),self.rect.width,15))
+        if self.health_remaining > 0:
+            pygame.draw.rect(screen, green, (self.rect.x, (self.rect.bottom + 10), int(self.rect.width * (self.health_remaining / self.health_start)), 15))
+            
+# sprite groups from classes, enemy, player, bullet
+sprite_group = pygame.sprite.Group()
+sprite_group.add(Enemy())
+
+player_group = pygame.sprite.Group()
+player = player(3)
+player_group.add(player)
+
+bullet_group = pygame.sprite.Group()
+bullet1 = bullet()
+
+# timed events, enemy spawning, faster spawning
+# creates a custom event
+spawn_event = pygame.event.custom_type()
+# how long between event triggers (in milliseconds, starts at 3.5 seconds)
+spawn_timer = 3500
+# sets the timer for this event
+pygame.time.set_timer(spawn_event, spawn_timer)
+
+# creates a new custom event
+faster_timer_event = pygame.event.custom_type()
+# time between event triggers (10 seconds)
+timer_event_timer = 10000
+# sets the timer for this event
+pygame.time.set_timer(faster_timer_event, timer_event_timer)
 
 # Game Loop
 running = True
@@ -99,9 +147,6 @@ while running:
     screen.fill((128, 128, 128))
     # Background Image
     screen.blit(background, (0, 0))
-    screen.blit(bulletImg, bulletRect.topleft)
-    screen.blit(playerImg, playerRect.topleft)
-    screen.blit(enemyImg, enemyRect.topleft)
 
     keys = pygame.key.get_pressed()
     # every event gets logged below and you loop through each event, like keystrokes
@@ -110,43 +155,41 @@ while running:
             sys.exit(0)
         if keys[pygame.K_ESCAPE]:
             sys.exit(0)
-        if keys[pygame.K_SPACE] and bullet_state == "ready":
-            bulletRect.x = playerRect.x
-            bulletRect.y = playerRect.y
-            bullet_state = "fire"
 
-    if bullet_state == "fire":
-        fire_bullet()
-    if bulletRect.y < -32:
-        bullet_state = "ready"
-        bulletRect.y = 700
-    # settings boundaries for the plane
-    if playerRect.x <= 0:
-        playerRect.x = 0
-        # subtracting the pixels of the plane from 800. (64 pixel plane)
-    if playerRect.x >= 736:
-        playerRect.x = 736
+        # every 3.5 seconds a new enemy spawns on the event trigger
+        if event.type == spawn_event:
+            sprite_group.add(Enemy())
+            # debug code, will only go off when event is triggered
+            print("new enemy")
 
-    if bulletRect.x <= 0:
-        bulletRect.x = 0
-    if bulletRect.x >= 750:
-        bulletRect.x = 750
+        # every 10 seconds the spawn timer will go down 0.2 seconds or 200 milliseconds
+        if event.type == faster_timer_event:
+            spawn_timer -= 200
+            # debug code
+            print("spawning faster")
 
-    if enemyRect.colliderect(bulletRect):
-        get_enemy_coords()
+        # checks for spacebar pressed, if bullet is ready to be fired, will add bullet1 to the bullet group
+        if keys[pygame.K_SPACE] and bullet1.state == "ready":
+            bullet1.state = "fire"
+            bullet_group.add(bullet1)
+            bullet1.rect.x = player.rect.x + 16
+            bullet1.rect.y = player.rect.y
 
+    # when the bullet goes out of bounds, state changes to ready and can be fired again
+    if bullet1.rect.y < -32:
+        bullet1.state = "ready"
 
-    # Collision check
-    for enemyRect in enemylist:
-        if enemyRect.colliderect(bulletRect) and bullet_state == "fire":
-         bulletRect.y = 700
-         bullet_state = "ready"
-         enemyRect.y = random.randint(-100,-50)
-         enemyRect.x = random.randint(0,736)
-         score += 1
-         print("Score:",score)
+        # checks if anything in bullet group collides with enemies, if so the enemy is deleted from the group and the bullet remains
+    pygame.sprite.groupcollide(bullet_group, sprite_group, False, True)
 
-    # calling the plane/enemy ONTO the screen
-    move_entities()
+    # .draw is the same as blitting, draws everything in the groups to the screen and activates the update() methods on each group
+    sprite_group.draw(screen)
+    sprite_group.update()
+    bullet_group.draw(screen)
+    bullet_group.update()
+    player_group.draw(screen)
+    player_group.update()
+
+    # refreshes the screen and keeps the fps at 60
     pygame.display.flip()
     clock.tick(60)
