@@ -61,7 +61,7 @@ class bullet(pygame.sprite.Sprite):
     # initializes bullet class and variables for all bullet objects
     def __init__(self):
         super().__init__()
-        self.speed = 8
+        self.speed = 10
         self.name = "bullet"
         self.x = 0
         self.y = 0
@@ -113,6 +113,13 @@ bullet1 = bullet()
 
 
 
+score = 0
+score_font = pygame.font.Font(None, 48)
+score_render = score_font.render(f"Score: {str(score)}", False, (255,255,255))
+
+
+
+
 # timed events, enemy spawning, faster spawning
 # creates a custom event
 spawn_event = pygame.event.custom_type()
@@ -137,7 +144,8 @@ while running:
     # background screen color update
     screen.fill((128, 128, 128))
     # Background Image
-    screen.blit(background,(0,0))    
+    screen.blit(background,(0,0)) 
+    screen.blit(score_render, (0,0))
 
     keys = pygame.key.get_pressed()
     # every event gets logged below and you loop through each event, like keystrokes
@@ -158,6 +166,8 @@ while running:
         # every 10 seconds the spawn timer will go down 0.2 seconds or 200 milliseconds
         if event.type == faster_timer_event:
             spawn_timer -= 200
+            # should reinitialize the timer to actually change spawn timing
+            pygame.time.set_timer(spawn_event, spawn_timer)
             # debug code
             print("spawning faster")
         
@@ -165,7 +175,7 @@ while running:
         if keys[pygame.K_SPACE] and bullet1.state == "ready":
             bullet1.state = "fire"
             bullet_group.add(bullet1)
-            bullet1.rect.x = player.rect.x + 16
+            bullet1.rect.x = player.rect.x + 24
             bullet1.rect.y = player.rect.y
     
     # when the bullet goes out of bounds, state changes to ready and can be fired again
@@ -173,7 +183,15 @@ while running:
         bullet1.state = "ready"    
     
     # checks if anything in bullet group collides with enemies, if so the enemy is deleted from the group and the bullet remains
-    pygame.sprite.groupcollide(bullet_group, sprite_group, False, True)
+    hit_list = pygame.sprite.groupcollide(bullet_group, sprite_group, False, True)
+
+    if hit_list:
+        for i in range(len(hit_list)):
+            score += 1
+            score_render = score_font.render(f"Score: {str(score)}", False, (255,255,255))
+            hit_list.clear()
+
+    
 
     # .draw is the same as blitting, draws everything in the groups to the screen and activates the update() methods on each group
     sprite_group.draw(screen)
