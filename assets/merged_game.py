@@ -15,6 +15,8 @@ clock = pygame.time.Clock()
 
 # background image
 background = pygame.image.load("background.jpg")
+level_2_bg = pygame.image.load("Background_space.png")
+level_3_bg = pygame.image.load("bg_3.png")
 
 
 
@@ -23,6 +25,17 @@ pygame.display.set_caption("Group 9 Project")
 icon = pygame.image.load("game_icon.png")
 pygame.display.set_icon(icon)
 
+
+
+# sounds
+pygame.mixer.music.load("Mecha Collection.wav")
+pygame.mixer.music.set_volume(0.25)
+pygame.mixer.music.play(-1)
+
+new_level = pygame.mixer.Sound("new_level.wav")
+new_level.set_volume(0.5)
+
+enemy_defeat = pygame.mixer.Sound("enemy_defeat.wav")
 
 
 # enemy class
@@ -55,6 +68,8 @@ class Enemy(pygame.sprite.Sprite):
         if self.rect.x > 736 and self.dir:
             self.rect.y += 40
             self.dir = False
+        if self.rect.y > 600:
+            sys.exit(0)
 
 # bullet class
 class bullet(pygame.sprite.Sprite):
@@ -73,6 +88,11 @@ class bullet(pygame.sprite.Sprite):
     def update(self):
         if self.state == "fire":
             self.rect.y -= self.speed
+        
+        if level == 2:
+            self.speed = 12
+        elif level == 3:
+            self.speed = 15
 
 # player class 
 class player(pygame.sprite.Sprite):
@@ -82,7 +102,7 @@ class player(pygame.sprite.Sprite):
         self.speed = 10
         self.name = "player"
         self.image = pygame.image.load("plane.png")
-        self.rect = self.image.get_rect(center=(370,480))
+        self.rect = self.image.get_rect(center=(370,520))
     
     # player movement method
     def update(self):
@@ -113,9 +133,14 @@ bullet1 = bullet()
 
 
 
+# UI
 score = 0
-score_font = pygame.font.Font(None, 48)
-score_render = score_font.render(f"Score: {str(score)}", False, (255,255,255))
+score_font = pygame.font.Font("monogram.ttf", 48)
+score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
+
+level = 1
+level_font = pygame.font.Font("monogram.ttf", 48)
+level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
 
 
 
@@ -144,8 +169,14 @@ while running:
     # background screen color update
     screen.fill((128, 128, 128))
     # Background Image
-    screen.blit(background,(0,0)) 
-    screen.blit(score_render, (0,0))
+    if level == 1:
+        screen.blit(background,(0,0))
+    if level == 2:
+        screen.blit(level_2_bg, (0,0))
+    if level == 3:
+        screen.blit(level_3_bg, (0,0))
+    screen.blit(score_render, (5,560))
+    screen.blit(level_render, (650, 560))
 
     keys = pygame.key.get_pressed()
     # every event gets logged below and you loop through each event, like keystrokes
@@ -155,43 +186,54 @@ while running:
         if keys[pygame.K_ESCAPE]:
             sys.exit(0)
 
-
         # every 3.5 seconds a new enemy spawns on the event trigger
         if event.type == spawn_event:
             sprite_group.add(Enemy())
             # debug code, will only go off when event is triggered
             print("new enemy")
-
-
-        # every 10 seconds the spawn timer will go down 0.2 seconds or 200 milliseconds
-        if event.type == faster_timer_event:
-            spawn_timer -= 200
-            # should reinitialize the timer to actually change spawn timing
-            pygame.time.set_timer(spawn_event, spawn_timer)
-            # debug code
-            print("spawning faster")
         
+        if event.type == faster_timer_event:
+            spawn_timer -= 150
+            pygame.time.set_timer(spawn_event, spawn_timer)
+            print("faster spawning")
+
         # checks for spacebar pressed, if bullet is ready to be fired, will add bullet1 to the bullet group
         if keys[pygame.K_SPACE] and bullet1.state == "ready":
             bullet1.state = "fire"
             bullet_group.add(bullet1)
             bullet1.rect.x = player.rect.x + 24
             bullet1.rect.y = player.rect.y
-    
+            print(bullet1.speed)
+
+    # debug for spawning timer, makes sure it never goes below 0 (which would stop spawning enemies)
+    if spawn_timer <= 500:
+        spawn_timer == 500
+
     # when the bullet goes out of bounds, state changes to ready and can be fired again
     if bullet1.rect.y < -32:
         bullet1.state = "ready"    
-    
+
     # checks if anything in bullet group collides with enemies, if so the enemy is deleted from the group and the bullet remains
     hit_list = pygame.sprite.groupcollide(bullet_group, sprite_group, False, True)
 
     if hit_list:
         for i in range(len(hit_list)):
             score += 1
-            score_render = score_font.render(f"Score: {str(score)}", False, (255,255,255))
+            score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
+            enemy_defeat.play()
             hit_list.clear()
 
-    
+    if score >= 20 and score < 40:
+        level = 2
+        level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+    elif score >= 40 and score < 60:
+        level = 3
+        level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+    elif score >= 60 and score < 80:
+        level = 4
+        level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+
+
 
     # .draw is the same as blitting, draws everything in the groups to the screen and activates the update() methods on each group
     sprite_group.draw(screen)
