@@ -252,6 +252,7 @@ def game():
     boss_one.speed = 6
     boss_one.jump = 100
     boss_one.pos = [random.randint(0,736), random.randint(0,50)]
+    boss_one.image = pygame.image.load("bomb_boss.png")
 
     player_group = pygame.sprite.Group()
     player = player()
