@@ -9,7 +9,7 @@ screen = pygame.display.set_mode((800,600))
 
 
 # Title Caption and Icon
-pygame.display.set_caption("Group 9 Project")
+pygame.display.set_caption("Group 9 Project: Galactic Invasion")
 icon = pygame.image.load("game_icon.png")
 pygame.display.set_icon(icon)
 
@@ -80,7 +80,7 @@ def paused():
         key_text = pause_font.render("Keybinds:", False, (255,255,255))
         key_rect = key_text.get_rect(centerx=screen_center, centery=255)
 
-        instructions_three = pause_font.render("\"A\": Move Left | \"D\": Move Right", False, (255,255,255))
+        instructions_three = pause_font.render("\"A\" or \"LEFT\": Move Left | \"D\" or \"RIGHT\": Move Right", False, (255,255,255))
         three_rect = instructions_three.get_rect(centerx=screen_center, centery=290)
 
         instructions_four = pause_font.render("\"Spacebar\": Fire Bullets", False, (255,255,255))
@@ -92,6 +92,15 @@ def paused():
         instructions_seven = pause_font.render("\"ESC\": Return to Main Menu", False, (255,255,255))
         seven_rect = instructions_seven.get_rect(centerx=screen_center, centery=350)
 
+        instructions_eight = pause_font.render("Difficulty increases gradually per level.", False, (255,255,255))
+        eight_rect = instructions_eight.get_rect(centerx=screen_center, centery=460)
+
+        instructions_nine = pause_font.render("Level will increase in 20 score intervals.", False, (255,255,255))
+        nine_rect = instructions_nine.get_rect(centerx=screen_center, centery=490)
+
+        boss_instructions = pause_font.render("Bosses will spawn once at levels 20, 40, 60, etc.", False, (255,255,255))
+        boss_rect = boss_instructions.get_rect(centerx=screen_center, centery=520)
+
         screen.blit(instructions_one, one_rect.topleft)
         screen.blit(instructions_two, two_rect.topleft)
         screen.blit(instructions_three, three_rect.topleft)
@@ -100,6 +109,9 @@ def paused():
         screen.blit(instructions_six, six_rect.topleft)
         screen.blit(key_text, key_rect.topleft)
         screen.blit(instructions_seven, seven_rect.topleft)
+        screen.blit(instructions_eight, eight_rect.topleft)
+        screen.blit(instructions_nine, nine_rect.topleft)
+        screen.blit(boss_instructions, boss_rect.topleft)
 
         keys = pygame.key.get_pressed()
 
@@ -126,7 +138,7 @@ def game():
             self.damage = 5
             self.image = pygame.image.load("nuclear-bomb.png")
             # using list for coords
-            self.pos = [random.randint(0,736), random.randint(50,150)]
+            self.pos = [random.randint(0,736), random.randint(25,100)]
             self.rect = self.image.get_rect(center=(self.pos[0],self.pos[1]))
             self.directions = [True, False]
             self.dir = random.choice(self.directions)
@@ -197,9 +209,9 @@ def game():
         # player movement method
         def update(self):
             # checks if movement keys have been pressed
-            if keys[pygame.K_d]:
+            if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self.rect.x += self.speed
-            if keys[pygame.K_a]:
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
                 self.rect.x -= self.speed
 
             # keeps player in bounds
@@ -239,6 +251,7 @@ def game():
     boss_one.name = "boss_one"
     boss_one.speed = 6
     boss_one.jump = 100
+    boss_one.pos = [random.randint(0,736), random.randint(0,50)]
 
     player_group = pygame.sprite.Group()
     player = player()
@@ -357,7 +370,7 @@ def game():
                 boss_defeated = True
                 hit_boss.clear()
 
-        if score == 20 and not boss_spawned:
+        if score % 20 == 0 and not boss_spawned and score != 0:
             spawner = 1
             pygame.time.set_timer(boss_spawn, spawner)
         if boss_spawned:
