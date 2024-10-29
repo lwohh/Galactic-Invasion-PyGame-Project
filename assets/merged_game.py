@@ -29,13 +29,15 @@ pygame.display.set_icon(icon)
 
 # sounds
 pygame.mixer.music.load("Mecha Collection.wav")
-pygame.mixer.music.set_volume(0.25)
+pygame.mixer.music.set_volume(0.10)
 pygame.mixer.music.play(-1)
 
 new_level = pygame.mixer.Sound("new_level.wav")
-new_level.set_volume(0.5)
+new_level.set_volume(0.25)
 
 enemy_defeat = pygame.mixer.Sound("enemy_defeat.wav")
+enemy_defeat.set_volume(0.10)
+
 
 
 # enemy class
