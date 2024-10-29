@@ -130,6 +130,7 @@ def game():
             self.rect = self.image.get_rect(center=(self.pos[0],self.pos[1]))
             self.directions = [True, False]
             self.dir = random.choice(self.directions)
+            self.jump = 40
     
         # enemy movement method
         def update(self):
@@ -141,13 +142,24 @@ def game():
         
             # keeps enemy within bounds 
             if self.rect.x < 0 and not self.dir:
-                self.rect.y += 40
+                self.rect.y += self.jump
                 self.dir = True
             if self.rect.x > 736 and self.dir:
-                self.rect.y += 40
+                self.rect.y += self.jump
                 self.dir = False
             if self.rect.y > 600:
                 sys.exit(0)
+            
+            match level:
+                case 1:
+                    self.speed = 8
+                case 2:
+                    self.speed = 10
+                case 3:
+                    self.speed = 12
+                case 4:
+                    self.speed = 14
+            print(self.speed)
 
     # bullet class
     class bullet(pygame.sprite.Sprite):
@@ -222,6 +234,12 @@ def game():
     sprite_group = pygame.sprite.Group()
     sprite_group.add(Enemy())
 
+    boss_group = pygame.sprite.Group()
+    boss_one = Enemy()
+    boss_one.name = "boss_one"
+    boss_one.speed = 6
+    boss_one.jump = 100
+
     player_group = pygame.sprite.Group()
     player = player()
     player_group.add(player)
@@ -245,6 +263,7 @@ def game():
     spawn_event = pygame.event.custom_type()
     # how long between event triggers (in milliseconds, starts at 3.5 seconds)
     spawn_timer = 3500
+    previous_timer = [3500]
     # sets the timer for this event
     pygame.time.set_timer(spawn_event, spawn_timer)
 
@@ -254,6 +273,11 @@ def game():
     timer_event_timer = 10000
     # sets the timer for this event
     pygame.time.set_timer(faster_timer_event, timer_event_timer)
+
+    boss_spawn = pygame.event.custom_type()
+    spawner = 0
+    boss_spawned = False
+    boss_defeated = False
 
 
     running = True
@@ -283,12 +307,17 @@ def game():
             if event.type == spawn_event:
                 sprite_group.add(Enemy())
                 # debug code, will only go off when event is triggered
-                print("new enemy")
+            
+            if event.type == boss_spawn:
+                boss_group.add(boss_one)
+                print("boss entered")
+                boss_spawned = True
         
             if event.type == faster_timer_event:
                 spawn_timer -= 150
                 pygame.time.set_timer(spawn_event, spawn_timer)
-                print("faster spawning")
+                previous_timer.append(spawn_timer)
+                print(previous_timer)
 
             # checks for spacebar pressed, if bullet is ready to be fired, will add bullet1 to the bullet group
             if keys[pygame.K_SPACE] and bullet1.state == "ready":
@@ -310,11 +339,42 @@ def game():
         hit_list = pygame.sprite.groupcollide(bullet_group, sprite_group, False, True)
 
         if hit_list:
+            print(hit_list)
             for i in range(len(hit_list)):
                 score += 1
                 score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
                 enemy_defeat.play()
                 hit_list.clear()
+        
+        hit_boss = pygame.sprite.groupcollide(bullet_group, boss_group, False, True)
+
+        if hit_boss:
+            for i in range(len(hit_boss)):
+                score += 1
+                score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
+                enemy_defeat.play()
+                boss_spawned = False
+                boss_defeated = True
+                hit_boss.clear()
+
+        if score == 20 and not boss_spawned:
+            spawner = 1
+            pygame.time.set_timer(boss_spawn, spawner)
+        if boss_spawned:
+            spawner = 0
+            pygame.time.set_timer(boss_spawn, spawner)
+            spawn_timer = 0
+            pygame.time.set_timer(spawn_event, spawn_timer)
+            timer_event_timer = 0
+            pygame.time.set_timer(faster_timer_event, timer_event_timer)
+        if not boss_spawned:
+            if boss_defeated:
+                spawn_timer += previous_timer[-1]
+                pygame.time.set_timer(spawn_event, spawn_timer)
+                timer_event_timer = 10000
+                pygame.time.set_timer(faster_timer_event, timer_event_timer)
+                boss_defeated = False
+
 
         if score >= 20 and score < 40:
             level = 2
@@ -333,6 +393,8 @@ def game():
         bullet_group.update()
         player_group.draw(screen)
         player_group.update()
+        boss_group.draw(screen)
+        boss_group.update()
 
         # refreshes the screen and keeps the fps at 60
         pygame.display.flip()
