@@ -23,20 +23,53 @@ def main_menu():
         screen_center = screen.get_width() // 2
         screen.fill((0,0,0))
         title_font = pygame.font.Font("monogram.ttf", 60)
-        main_menu_font = pygame.font.Font("monogram.ttf", 38)
 
         title_text = title_font.render("Group 9 Project: Galactic Invasion", False, (255,255,255))
-        title_rect = title_text.get_rect(centerx=screen_center, centery=50)
+        title_rect = title_text.get_rect(centerx=screen_center, centery=100)
 
-        menu_text = main_menu_font.render("Press \"G\" to begin the Invasion!", False, (255,255,255))
-        menu_rect_one = menu_text.get_rect(centerx=screen_center, centery=300)
+        start_img = pygame.image.load("UI - start.png").convert_alpha()
+        quit_img = pygame.image.load("UI - quit.png").convert_alpha()
+        options_img = pygame.image.load("UI - options.png").convert_alpha()
 
-        instructions_text = main_menu_font.render("Press \"I\" to see the Instructions and Keybinds!", False, (255,255,255))
-        instructions_rect = instructions_text.get_rect(centerx=screen_center, centery=360)
+        class Button():
+            def __init__(self, x, y, image, scale):
+                width = image.get_width()
+                height = image.get_height()
+                self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+                self.rect = self.image.get_rect()
+                self.rect.topleft = (x, y)
+                self.clicked = False
+
+            
+            def draw(self):
+                # draw button on screen
+                screen.blit(self.image, (self.rect.x, self.rect.y))
+
+                pos = pygame.mouse.get_pos()
+                if self.rect.collidepoint(pos):
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        self.clicked = True
+                    if pygame.mouse.get_pressed()[0] == 0:
+                        self.clicked = False
+
+
+        # button instances
+        start_button = Button(315, 275, start_img, 1.5)
+        start_button.draw()
+        if start_button.clicked == True:
+            game()
+
+        quit_button = Button(315, 425, quit_img, 1.5)
+        quit_button.draw()
+        if quit_button.clicked == True:
+            sys.exit(0)
+        
+        options_button = Button(315, 350, options_img, 1.5)
+        options_button.draw()
+        if options_button.clicked == True:
+            paused()
 
         screen.blit(title_text, title_rect.topleft)
-        screen.blit(menu_text, menu_rect_one.topleft)
-        screen.blit(instructions_text, instructions_rect.topleft)
 
         keys = pygame.key.get_pressed()
 
@@ -67,6 +100,34 @@ def paused():
         screen.fill((0,0,0))
         pause_font = pygame.font.Font("monogram.ttf", 30)
 
+        back_img = pygame.image.load("UI - back.png").convert_alpha()
+
+
+        class Button():
+            def __init__(self, x, y, image, scale):
+                width = image.get_width()
+                height = image.get_height()
+                self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+                self.rect = self.image.get_rect()
+                self.rect.topleft = (x, y)
+                self.clicked = False
+
+            
+            def draw(self):
+                # draw button on screen
+                screen.blit(self.image, (self.rect.x, self.rect.y))
+
+                pos = pygame.mouse.get_pos()
+                if self.rect.collidepoint(pos):
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        self.clicked = True
+                    if pygame.mouse.get_pressed()[0] == 0:
+                        self.clicked = False
+
+        back_button = Button(20, 550, back_img, 1.0)
+        back_button.draw()
+        if back_button.clicked == True:
+            keep_run = False
 
         instructions_one = pause_font.render("Game Instructions", False, (255,255,255))
         one_rect = instructions_one.get_rect(centerx=screen_center, centery=50)
@@ -113,15 +174,10 @@ def paused():
         screen.blit(instructions_nine, nine_rect.topleft)
         screen.blit(boss_instructions, boss_rect.topleft)
 
-        keys = pygame.key.get_pressed()
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
-            if keys[pygame.K_ESCAPE]:
-                main_menu()
                 
-
         pygame.display.flip()
         clock.tick(60)
 
@@ -220,12 +276,55 @@ def game():
             if self.rect.x > 736:
                 self.rect.x = 736
 
+    # boss class
+    class Boss(pygame.sprite.Sprite):
+        # initializes the class, and info for all new objects
+        def __init__(self):
+            super().__init__()
+            self.speed = 10
+            self.name = "enemy"
+            self.damage = 5
+            self.image = pygame.image.load("bomb_boss.png")
+            # using list for coords
+            self.pos = [random.randint(0,736), random.randint(25,50)]
+            self.rect = self.image.get_rect(center=(self.pos[0],self.pos[1]))
+            self.directions = [True, False]
+            self.dir = random.choice(self.directions)
+            self.jump = 80
+    
+        # enemy movement method
+        def update(self):
+            # moves enemy left and right depending on random direction from self.dir
+            if not self.dir:
+                self.rect.x -= self.speed
+            if self.dir:
+                self.rect.x += self.speed
+        
+            # keeps enemy within bounds 
+            if self.rect.x < 0 and not self.dir:
+                self.rect.y += self.jump
+                self.dir = True
+            if self.rect.x > 736 and self.dir:
+                self.rect.y += self.jump
+                self.dir = False
+            if self.rect.y > 600:
+                sys.exit(0)
+            
+            match level:
+                case 1:
+                    self.speed = 8
+                case 2:
+                    self.speed = 10
+                case 3:
+                    self.speed = 12
+                case 4:
+                    self.speed = 14
 
     clock = pygame.time.Clock()
 
 
     # background image
-    background = pygame.image.load("background.jpg")
+    background = pygame.image.load("background_one.jpg")
     level_2_bg = pygame.image.load("Background_space.png")
     level_3_bg = pygame.image.load("bg_3.png")
 
@@ -247,12 +346,6 @@ def game():
     sprite_group.add(Enemy())
 
     boss_group = pygame.sprite.Group()
-    boss_one = Enemy()
-    boss_one.name = "boss_one"
-    boss_one.speed = 6
-    boss_one.jump = 100
-    boss_one.pos = [random.randint(0,736), random.randint(0,50)]
-    boss_one.image = pygame.image.load("bomb_boss.png")
 
     player_group = pygame.sprite.Group()
     player = player()
@@ -277,7 +370,6 @@ def game():
     spawn_event = pygame.event.custom_type()
     # how long between event triggers (in milliseconds, starts at 3.5 seconds)
     spawn_timer = 3500
-    previous_timer = [3500]
     # sets the timer for this event
     pygame.time.set_timer(spawn_event, spawn_timer)
 
@@ -300,12 +392,12 @@ def game():
         screen.fill((128, 128, 128))
         # Background Image
         if level == 1:
-            screen.blit(background,(0,0))
+            screen.blit(background,(-600,-200))
         if level == 2:
             screen.blit(level_2_bg, (0,0))
         if level == 3:
             screen.blit(level_3_bg, (0,0))
-        screen.blit(score_render, (5,560))
+        screen.blit(score_render, (5,545))
         screen.blit(level_render, (650, 560))
 
         keys = pygame.key.get_pressed()
@@ -323,15 +415,13 @@ def game():
                 # debug code, will only go off when event is triggered
             
             if event.type == boss_spawn:
-                boss_group.add(boss_one)
+                boss_group.add(Boss())
                 print("boss entered")
                 boss_spawned = True
         
             if event.type == faster_timer_event:
                 spawn_timer -= 150
                 pygame.time.set_timer(spawn_event, spawn_timer)
-                previous_timer.append(spawn_timer)
-                print(previous_timer)
 
             # checks for spacebar pressed, if bullet is ready to be fired, will add bullet1 to the bullet group
             if keys[pygame.K_SPACE] and bullet1.state == "ready":
@@ -339,7 +429,6 @@ def game():
                 bullet_group.add(bullet1)
                 bullet1.rect.x = player.rect.x + 24
                 bullet1.rect.y = player.rect.y
-                print(bullet1.speed)
 
         # debug for spawning timer, makes sure it never goes below 0 (which would stop spawning enemies)
         if spawn_timer <= 500:
@@ -350,7 +439,7 @@ def game():
             bullet1.state = "ready"    
 
         # checks if anything in bullet group collides with enemies, if so the enemy is deleted from the group and the bullet remains
-        hit_list = pygame.sprite.groupcollide(bullet_group, sprite_group, False, True)
+        hit_list = pygame.sprite.groupcollide(bullet_group, sprite_group, True, True)
 
         if hit_list:
             print(hit_list)
@@ -358,6 +447,7 @@ def game():
                 score += 1
                 score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
                 enemy_defeat.play()
+                bullet1.state = "ready"
                 hit_list.clear()
         
         hit_boss = pygame.sprite.groupcollide(bullet_group, boss_group, False, True)
@@ -372,21 +462,13 @@ def game():
                 hit_boss.clear()
 
         if score % 20 == 0 and not boss_spawned and score != 0:
-            spawner = 1
+            spawner = 15
             pygame.time.set_timer(boss_spawn, spawner)
         if boss_spawned:
             spawner = 0
             pygame.time.set_timer(boss_spawn, spawner)
-            spawn_timer = 0
-            pygame.time.set_timer(spawn_event, spawn_timer)
-            timer_event_timer = 0
-            pygame.time.set_timer(faster_timer_event, timer_event_timer)
         if not boss_spawned:
             if boss_defeated:
-                spawn_timer += previous_timer[-1]
-                pygame.time.set_timer(spawn_event, spawn_timer)
-                timer_event_timer = 10000
-                pygame.time.set_timer(faster_timer_event, timer_event_timer)
                 boss_defeated = False
 
 
