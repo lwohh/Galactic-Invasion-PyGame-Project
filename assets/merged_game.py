@@ -320,8 +320,12 @@ def game():
                 case 4:
                     self.speed = 14
 
-    clock = pygame.time.Clock()
+    ss = spritesheet.spritesheet("ship.png")
+    image = ss.image_at((0,0,16,24))
+    images = []
+    images = ss.images_at((0,0,16,24), (16,0,16,24), colorkey=(255,255,255))
 
+    clock = pygame.time.Clock()
 
     # background image
     background = pygame.image.load("background_one.jpg")
@@ -399,6 +403,7 @@ def game():
             screen.blit(level_3_bg, (0,0))
         screen.blit(score_render, (5,545))
         screen.blit(level_render, (650, 560))
+        screen.blit(images, (0,0))
 
         keys = pygame.key.get_pressed()
         # every event gets logged below and you loop through each event, like keystrokes
