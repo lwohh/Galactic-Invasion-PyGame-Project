@@ -14,7 +14,7 @@ icon = pygame.image.load("game_icon.png")
 pygame.display.set_icon(icon)
 
 
-# main menu
+# Main Menu Function
 def main_menu():
     clock = pygame.time.Clock()
     run = True
@@ -22,15 +22,19 @@ def main_menu():
     while run:
         screen_center = screen.get_width() // 2
         screen.fill((0,0,0))
+        # font used for main menu text
         title_font = pygame.font.Font("monogram.ttf", 60)
 
+        # game title text
         title_text = title_font.render("Group 9 Project: Galactic Invasion", False, (255,255,255))
         title_rect = title_text.get_rect(centerx=screen_center, centery=100)
 
+        # button images
         start_img = pygame.image.load("UI - start.png").convert_alpha()
         quit_img = pygame.image.load("UI - quit.png").convert_alpha()
         options_img = pygame.image.load("UI - options.png").convert_alpha()
 
+        # button class
         class Button():
             def __init__(self, x, y, image, scale):
                 width = image.get_width()
@@ -69,8 +73,10 @@ def main_menu():
         if options_button.clicked == True:
             paused()
 
+        # blitting title text to screen
         screen.blit(title_text, title_rect.topleft)
 
+        # key and event queue for main menu
         keys = pygame.key.get_pressed()
 
         for event in pygame.event.get():
@@ -89,20 +95,22 @@ def main_menu():
         clock.tick(60)
 
 
-# pause menu
+# Options Menu Function
 def paused():
     clock = pygame.time.Clock()
     keep_run = True
     pygame.mixer.music.pause()
     while keep_run:
-
         screen_center = screen.get_width() // 2
         screen.fill((0,0,0))
+
+        # options menu font
         pause_font = pygame.font.Font("monogram.ttf", 30)
 
+        # button image
         back_img = pygame.image.load("UI - back.png").convert_alpha()
 
-
+        # button class
         class Button():
             def __init__(self, x, y, image, scale):
                 width = image.get_width()
@@ -124,11 +132,13 @@ def paused():
                     if pygame.mouse.get_pressed()[0] == 0:
                         self.clicked = False
 
+        # creating button
         back_button = Button(20, 550, back_img, 1.0)
         back_button.draw()
         if back_button.clicked == True:
             keep_run = False
 
+        # options menu text
         instructions_one = pause_font.render("Game Instructions", False, (255,255,255))
         one_rect = instructions_one.get_rect(centerx=screen_center, centery=50)
 
@@ -162,6 +172,7 @@ def paused():
         boss_instructions = pause_font.render("Bosses will spawn once at levels 20, 40, 60, etc.", False, (255,255,255))
         boss_rect = boss_instructions.get_rect(centerx=screen_center, centery=520)
 
+        # blitting options text to screen
         screen.blit(instructions_one, one_rect.topleft)
         screen.blit(instructions_two, two_rect.topleft)
         screen.blit(instructions_three, three_rect.topleft)
@@ -174,6 +185,7 @@ def paused():
         screen.blit(instructions_nine, nine_rect.topleft)
         screen.blit(boss_instructions, boss_rect.topleft)
 
+        # event queue for options menu
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
@@ -182,7 +194,7 @@ def paused():
         clock.tick(60)
 
 
-# Game Loop
+# Main Game Function
 def game():
     # enemy class
     class Enemy(pygame.sprite.Sprite):
@@ -192,7 +204,10 @@ def game():
             self.speed = 8
             self.name = "enemy"
             self.damage = 5
-            self.image = pygame.image.load("nuclear-bomb.png")
+            self.images = [pygame.image.load("enemy.png"), pygame.image.load("enemy_2.png")]
+            self.step_index = 0
+            self.image = self.images[0]
+            self.image = pygame.transform.scale(self.image, (16 * 3, 16 * 3))
             # using list for coords
             self.pos = [random.randint(0,736), random.randint(25,100)]
             self.rect = self.image.get_rect(center=(self.pos[0],self.pos[1]))
@@ -207,6 +222,14 @@ def game():
                 self.rect.x -= self.speed
             if self.dir:
                 self.rect.x += self.speed
+            
+            # animating sprite
+            self.image = self.images[self.step_index // 20]
+            self.image = pygame.transform.scale(self.image, (16 * 3, 16 * 3))
+            self.step_index += 1
+            # resets animation index
+            if self.step_index >= 40:
+                self.step_index = 0
         
             # keeps enemy within bounds 
             if self.rect.x < 0 and not self.dir:
@@ -286,6 +309,7 @@ def game():
 
             self.step_index = 0
             self.image = self.idle[0]
+            self.image = pygame.transform.scale(self.image, (16*2.5, 24*2.5))
             self.rect = self.image.get_rect(center=(370,520))
             self.pwr_up = False
 
@@ -331,7 +355,10 @@ def game():
             self.speed = 10
             self.name = "enemy"
             self.damage = 5
-            self.image = pygame.image.load("bomb_boss.png")
+            self.images = [pygame.image.load("boss_1.png"), pygame.image.load("boss_2.png")]
+            self.step_index = 0
+            self.image = self.images[0]
+            self.image = pygame.transform.scale(self.image, (32 * 3, 32 * 3))
             # using list for coords
             self.pos = [random.randint(0,736), random.randint(25,50)]
             self.rect = self.image.get_rect(center=(self.pos[0],self.pos[1]))
@@ -346,6 +373,12 @@ def game():
                 self.rect.x -= self.speed
             if self.dir:
                 self.rect.x += self.speed
+            
+            self.image = self.images[self.step_index//20]
+            self.image = pygame.transform.scale(self.image, (32 * 3, 32 * 3))
+            self.step_index += 1
+            if self.step_index >= 40:
+                self.step_index = 0
         
             # keeps enemy within bounds 
             if self.rect.x < 0 and not self.dir:
@@ -426,10 +459,11 @@ def game():
     clock = pygame.time.Clock()
 
     # background image
-    background = pygame.image.load("background_one.jpg")
+    background = pygame.image.load("background_four.png")
+    background = pygame.transform.scale(background, (640 * 1.75, 360 * 1.75))
     level_2_bg = pygame.image.load("Background_space.png")
     level_3_bg = pygame.image.load("bg_3.png")
-
+    
 
     # sounds
     pygame.mixer.music.load("Mecha Collection.wav")
@@ -443,7 +477,7 @@ def game():
     enemy_defeat.set_volume(0.10)
 
 
-    # sprite groups from classes, enemy, player, bullet
+    # sprite groups from classes for enemy, player, bullet, boss, powerup
     sprite_group = pygame.sprite.Group()
     sprite_group.add(Enemy())
 
@@ -460,7 +494,7 @@ def game():
 
 
     # UI
-    score = 0
+    score = 19
     score_font = pygame.font.Font("monogram.ttf", 48)
     score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
 
@@ -488,23 +522,22 @@ def game():
     pwr_up_timer = random.randint(20000, 35000)
     pygame.time.set_timer(pwr_up_event, pwr_up_timer)
 
-    boss_spawn = pygame.event.custom_type()
-    spawner = 0
+    # checks if boss is spawned
     boss_spawned = False
-    boss_defeated = False
 
     pwr_down_event = pygame.event.custom_type()
     pwr_down_time = 9000
     pygame.time.set_timer(pwr_down_event, pwr_down_time)
 
 
+    # main game loop
     running = True
     while running:
         # background screen color update
         screen.fill((128, 128, 128))
         # Background Image
         if level == 1:
-            screen.blit(background,(-600,-200))
+            screen.blit(background, (0,0))
         if level == 2:
             screen.blit(level_2_bg, (0,0))
         if level == 3:
@@ -524,19 +557,17 @@ def game():
             # every 3.5 seconds a new enemy spawns on the event trigger
             if event.type == spawn_event:
                 sprite_group.add(Enemy())
-                # debug code, will only go off when event is triggered
-            
-            if event.type == boss_spawn:
-                boss_group.add(Boss())
-                boss_spawned = True
         
+            # causes faster spawning for enemies
             if event.type == faster_timer_event:
                 spawn_timer -= 150
                 pygame.time.set_timer(spawn_event, spawn_timer)
 
+            # spawns in power up sprite
             if event.type == pwr_up_event:
                 pwr_up_group.add(Powerup())
             
+            # removes power up abilities
             if event.type == pwr_down_event:
                 player.speed = 10
                 player.pwr_up = False
@@ -559,9 +590,10 @@ def game():
         if bullet1.rect.y < -32:
             bullet1.state = "ready"    
 
-        # checks if anything in bullet group collides with enemies, if so the enemy is deleted from the group and the bullet remains
+        # checks if anything in bullet group collides with enemies, if so the enemy and bullet are deleted from groups
         hit_list = pygame.sprite.groupcollide(bullet_group, sprite_group, True, True)
 
+        # checks if sprites are in the hit_list group, if so, score +1, clears group
         if hit_list:
             for i in range(len(hit_list)):
                 score += 1
@@ -570,34 +602,32 @@ def game():
                 bullet1.state = "ready"
                 hit_list.clear()
         
-        hit_boss = pygame.sprite.groupcollide(bullet_group, boss_group, False, True)
+        # checks for collision with boss, if so, deletes boss and bullet
+        hit_boss = pygame.sprite.groupcollide(bullet_group, boss_group, True, True)
 
+        # checks if sprites are in the hit_boss, if so, score +1, clears group
         if hit_boss:
             for i in range(len(hit_boss)):
                 score += 1
                 score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
                 enemy_defeat.play()
                 boss_spawned = False
-                boss_defeated = True
                 hit_boss.clear()
         
+        # checks power up collision
         pwr_list = pygame.sprite.groupcollide(player_group, pwr_up_group, False, True)
 
+        # gives player power ups
         if pwr_list:
             choose_pwr_up()
             pwr_list.clear()
 
+        # spawns boss every 20 score
         if score % 20 == 0 and not boss_spawned and score != 0:
-            spawner = 15
-            pygame.time.set_timer(boss_spawn, spawner)
-        if boss_spawned:
-            spawner = 0
-            pygame.time.set_timer(boss_spawn, spawner)
-        if not boss_spawned:
-            if boss_defeated:
-                boss_defeated = False
+            boss_group.add(Boss())
+            boss_spawned = True
 
-
+        # changes level every 20 score
         if score >= 20 and score < 40:
             level = 2
             level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
