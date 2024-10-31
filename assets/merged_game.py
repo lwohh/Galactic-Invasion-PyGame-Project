@@ -227,7 +227,6 @@ def game():
                     self.speed = 12
                 case 4:
                     self.speed = 14
-            print(self.speed)
 
     # bullet class
     class bullet(pygame.sprite.Sprite):
@@ -235,10 +234,16 @@ def game():
         def __init__(self):
             super().__init__()
             self.speed = 10
+            self.old_speed = 10
             self.name = "bullet"
             self.x = 0
             self.y = 0
-            self.image = pygame.image.load("bullet.png")
+            self.pwr_up = False
+            self.images = [pygame.image.load("laser_f_1.png"), pygame.image.load("laser_f_2.png")]
+            
+            self.step_index = 0
+            self.image = self.images[self.step_index]
+            self.image = pygame.transform.scale(self.image, (5*2.75, 12*2.75))
             self.rect = self.image.get_rect(center=(self.x,self.y))
             self.state = "ready"
     
@@ -246,11 +251,25 @@ def game():
         def update(self):
             if self.state == "fire":
                 self.rect.y -= self.speed
+                self.image = self.images[self.step_index // 15]
+                self.step_index += 1
+            
+            if self.step_index >= 30:
+                self.step_index = 0
+
+            self.image = pygame.transform.scale(self.image, (5*2.75, 12*2.75))
 
             if level == 2:
-                self.speed = 12
+                self.old_speed = 12
             elif level == 3:
-                self.speed = 15
+                self.old_speed = 15
+            
+        def power_up(self):
+            if not self.pwr_up:
+                self.old_speed = self.speed
+                self.speed += 5
+                self.pwr_up = True
+            
 
     # player class 
     class player(pygame.sprite.Sprite):
@@ -259,22 +278,50 @@ def game():
             super().__init__()
             self.speed = 10
             self.name = "player"
-            self.image = pygame.image.load("plane.png")
+            self.left = [pygame.image.load("ship_f_1.png"), pygame.image.load("ship_f_11.png")]
+            
+            self.right = [pygame.image.load("ship_f_5.png"), pygame.image.load("ship_f_55.png")]
+            
+            self.idle = [pygame.image.load("ship_f_3.png"), pygame.image.load("ship_f_33.png")]
+
+            self.step_index = 0
+            self.image = self.idle[0]
             self.rect = self.image.get_rect(center=(370,520))
+            self.pwr_up = False
 
         # player movement method
         def update(self):
             # checks if movement keys have been pressed
             if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self.rect.x += self.speed
+                self.image = self.right[self.step_index // 15]
+
             if keys[pygame.K_a] or keys[pygame.K_LEFT]:
                 self.rect.x -= self.speed
+                self.image = self.left[self.step_index // 15]
 
+            if not keys[pygame.K_a] and not keys[pygame.K_d]:
+                self.image = self.idle[self.step_index // 15]
+            
+            self.step_index += 1
+
+            if self.step_index >= 30:
+                self.step_index = 0
+
+            self.image = pygame.transform.scale(self.image, (16*2.5, 24*2.5))
             # keeps player in bounds
             if self.rect.x < 0:
                 self.rect.x = 0
             if self.rect.x > 736:
                 self.rect.x = 736
+
+
+        def power_up(self):
+            if self.pwr_up == False:
+                self.speed += 5
+                print("power_Up")
+                self.pwr_up = True
+
 
     # boss class
     class Boss(pygame.sprite.Sprite):
@@ -320,10 +367,61 @@ def game():
                 case 4:
                     self.speed = 14
 
-    ss = spritesheet.spritesheet("ship.png")
-    image = ss.image_at((0,0,16,24))
-    images = []
-    images = ss.images_at((0,0,16,24), (16,0,16,24), colorkey=(255,255,255))
+    # power-up class
+    class Powerup(pygame.sprite.Sprite):
+        def __init__(self):
+            super().__init__()
+            self.speed = 4
+            self.pos = [random.randint(0,700), random.randint(10,30)]
+            self.animate = [pygame.image.load("pwr_up_f_1.png"), pygame.image.load("pwr_up_f_2.png")]
+            self.step_index = 0
+            self.image = self.animate[self.step_index]
+            self.image = pygame.transform.scale(self.image, (16*2, 16*2))
+            self.rect = self.image.get_rect(center=(self.pos[0],self.pos[-1]))
+        
+        def update(self):
+            self.rect.y += self.speed
+            self.image = self.animate[self.step_index // 15]
+            self.image = pygame.transform.scale(self.image, (16*2, 16*2))
+            self.step_index += 1
+
+            if self.step_index >= 30:
+                self.step_index = 0
+            
+            if self.pos[-1] >= 800:
+                self.kill()
+
+    # chooses which power up to enable
+    def choose_pwr_up():
+        random_pwr = [1,2,3,4,5,6,7,8,9,10,11,12]
+        random_choose = random.choice(random_pwr)
+
+        match random_choose:
+            case 1:
+                player.power_up()
+            case 2:
+                bullet1.power_up()
+            case 3:
+                pygame.sprite.Group.empty(sprite_group)
+            case 4:
+                player.power_up()
+            case 5:
+                bullet1.power_up()
+            case 6:
+                player.power_up()
+            case 7:
+                player.power_up()
+            case 8:
+                bullet1.power_up()
+            case 9:
+                bullet1.power_up()
+            case 10:
+                player.power_up()
+            case 11:
+                player.power_up()
+            case 12:
+                player.power_up()
+
 
     clock = pygame.time.Clock()
 
@@ -358,6 +456,8 @@ def game():
     bullet_group = pygame.sprite.Group()
     bullet1 = bullet()
 
+    pwr_up_group = pygame.sprite.Group()
+
 
     # UI
     score = 0
@@ -384,10 +484,18 @@ def game():
     # sets the timer for this event
     pygame.time.set_timer(faster_timer_event, timer_event_timer)
 
+    pwr_up_event = pygame.event.custom_type()
+    pwr_up_timer = random.randint(20000, 35000)
+    pygame.time.set_timer(pwr_up_event, pwr_up_timer)
+
     boss_spawn = pygame.event.custom_type()
     spawner = 0
     boss_spawned = False
     boss_defeated = False
+
+    pwr_down_event = pygame.event.custom_type()
+    pwr_down_time = 9000
+    pygame.time.set_timer(pwr_down_event, pwr_down_time)
 
 
     running = True
@@ -403,7 +511,6 @@ def game():
             screen.blit(level_3_bg, (0,0))
         screen.blit(score_render, (5,545))
         screen.blit(level_render, (650, 560))
-        screen.blit(images, (0,0))
 
         keys = pygame.key.get_pressed()
         # every event gets logged below and you loop through each event, like keystrokes
@@ -421,19 +528,28 @@ def game():
             
             if event.type == boss_spawn:
                 boss_group.add(Boss())
-                print("boss entered")
                 boss_spawned = True
         
             if event.type == faster_timer_event:
                 spawn_timer -= 150
                 pygame.time.set_timer(spawn_event, spawn_timer)
 
+            if event.type == pwr_up_event:
+                pwr_up_group.add(Powerup())
+            
+            if event.type == pwr_down_event:
+                player.speed = 10
+                player.pwr_up = False
+                bullet1.speed = bullet1.old_speed
+                bullet1.pwr_up = False
+                print(bullet1.speed)
+
             # checks for spacebar pressed, if bullet is ready to be fired, will add bullet1 to the bullet group
             if keys[pygame.K_SPACE] and bullet1.state == "ready":
                 bullet1.state = "fire"
                 bullet_group.add(bullet1)
-                bullet1.rect.x = player.rect.x + 24
-                bullet1.rect.y = player.rect.y
+                bullet1.rect.x = player.rect.x + 12
+                bullet1.rect.y = player.rect.y - 25
 
         # debug for spawning timer, makes sure it never goes below 0 (which would stop spawning enemies)
         if spawn_timer <= 500:
@@ -447,7 +563,6 @@ def game():
         hit_list = pygame.sprite.groupcollide(bullet_group, sprite_group, True, True)
 
         if hit_list:
-            print(hit_list)
             for i in range(len(hit_list)):
                 score += 1
                 score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
@@ -465,6 +580,12 @@ def game():
                 boss_spawned = False
                 boss_defeated = True
                 hit_boss.clear()
+        
+        pwr_list = pygame.sprite.groupcollide(player_group, pwr_up_group, False, True)
+
+        if pwr_list:
+            choose_pwr_up()
+            pwr_list.clear()
 
         if score % 20 == 0 and not boss_spawned and score != 0:
             spawner = 15
@@ -496,6 +617,8 @@ def game():
         player_group.update()
         boss_group.draw(screen)
         boss_group.update()
+        pwr_up_group.draw(screen)
+        pwr_up_group.update()
 
         # refreshes the screen and keeps the fps at 60
         pygame.display.flip()
