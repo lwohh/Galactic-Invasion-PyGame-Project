@@ -239,7 +239,7 @@ def game():
 
 
     # UI
-    score = 259
+    score = 0
     score_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 18)
     score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
 
