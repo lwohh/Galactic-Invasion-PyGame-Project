@@ -239,7 +239,7 @@ def game():
 
 
     # UI
-    score = 0
+    score = 259
     score_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 18)
     score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
 
@@ -349,6 +349,8 @@ def game():
                     self.speed = 13
                 case 12:
                     self.speed = 13.5
+                case _:
+                    self.speed = 14
 
 
     # bullet class
@@ -546,6 +548,8 @@ def game():
                     self.speed = 15.5
                 case 12:
                     self.speed = 16.25
+                case _:
+                    self.speed = 17
 
 
     # power-up class
@@ -724,6 +728,8 @@ def game():
                 screen.blit(level_11_bg, (0,0))
             case 12:
                 screen.blit(level_12_bg, (0,0))
+            case _:
+                screen.blit(level_12_bg, (0,0))
             
 
         # displaying UI
@@ -848,7 +854,9 @@ def game():
         elif score >= 220 and score < 240:
             level = 12
             level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
-
+        else: 
+            level = 13
+            level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
 
         # .draw is the same as blitting, draws everything in the groups to the screen and activates the update() methods on each group
         sprite_group.draw(screen)
