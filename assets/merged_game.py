@@ -13,8 +13,9 @@ pygame.display.set_caption("Group 9 Project: Galactic Invasion")
 icon = pygame.image.load("UI\\game_icon.png")
 pygame.display.set_icon(icon)
 
+
 # List containing top 10 scores for current game instance, resets once game is FULLY closed
-high_scores = [0,0,0,0,0,0,0,0,0,0]
+high_scores = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
 # Main Menu Function
@@ -221,7 +222,7 @@ def paused():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
-            if keys[pygame.K_ESCAPE]:
+            if keys[pygame.K_TAB]:
                 keep_run = False
                 
 
@@ -236,7 +237,6 @@ def game():
     global high_scores
     screen.fill((0,0,0))
     clock = pygame.time.Clock()
-    explode = False
 
 
     # UI
@@ -251,7 +251,6 @@ def game():
 
     # enemy class
     class Enemy(pygame.sprite.Sprite):
-        global explode
         # initializes the class, and info for all new objects
         def __init__(self):
             super().__init__()
@@ -298,9 +297,6 @@ def game():
                 bullet1.rect.y = -50
                 pygame.sprite.Sprite.kill(bullet1)
 
-            if explode:
-                self.exploding = True
-                explosion_sound.play()
 
             if self.exploding:
                 self.explode_step_index += 1
@@ -309,6 +305,7 @@ def game():
                     self.exploding = False
                     pygame.sprite.Sprite.add(self, hit_list)
                     pygame.sprite.Sprite.remove(self, sprite_group)
+                    self.rect.x = -100
                     
 
                 self.image = self.explosion[self.explode_step_index // 10]
@@ -360,7 +357,6 @@ def game():
                     self.speed = 14
 
 
-
     # bullet class
     class bullet(pygame.sprite.Sprite):
         # initializes bullet class and variables for all bullet objects
@@ -390,13 +386,16 @@ def game():
             if self.step_index >= 30:
                 self.step_index = 0
 
+            if self.rect.y <= -32:
+                self.state = "ready"
+
             self.image = pygame.transform.scale(self.image, (5*2.75, 12*2.75))
 
             match level:
                 case 2:
                     self.old_speed = 12
                 case 3:
-                    self.old_speed = 15
+                    self.old_speed = 14
             
         def power_up(self):
             if not self.pwr_up:
@@ -510,6 +509,7 @@ def game():
                     self.exploding = False
                     pygame.sprite.Sprite.add(self, hit_boss)
                     pygame.sprite.Sprite.remove(self, boss_group)
+                    self.rect.x = -100
                     
 
                 self.image = self.explosion[self.explode_step_index // 10]
@@ -559,9 +559,6 @@ def game():
                 case _:
                     self.speed = 17
 
-        def power_up(self):
-            self.exploding = True
-
 
     # power-up class
     class Powerup(pygame.sprite.Sprite):
@@ -592,7 +589,7 @@ def game():
     def choose_pwr_up():
         global explode
         random_pwr = [1,2,3,4,5,6,7,8,9,10,11,12]
-        random_choose = 3
+        random_choose = random.choice(random_pwr)
 
         match random_choose:
             case 1:
@@ -600,11 +597,11 @@ def game():
             case 2:
                 bullet1.power_up()
             case 3:
-                explode = True
+                bullet1.power_up()
             case 4:
                 player.power_up()
             case 5:
-                bullet1.power_up()
+                player.power_up()
             case 6:
                 player.power_up()
             case 7:
@@ -754,7 +751,7 @@ def game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
-            if keys[pygame.K_ESCAPE]:
+            if keys[pygame.K_TAB]:
                 pygame.mixer.music.pause()
                 main_menu()
 
@@ -814,6 +811,7 @@ def game():
                 score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
                 enemy_defeat.play()
                 boss_spawned = False
+                bullet1.state = "ready"
                 pygame.sprite.Group.empty(hit_boss)
         
 
@@ -885,6 +883,8 @@ def game():
         pwr_up_group.draw(screen)
         pwr_up_group.update()
 
+        print(bullet1.state)
+
 
         # refreshes the screen and keeps the fps at 60
         pygame.display.flip()
@@ -948,39 +948,52 @@ def leaderboard():
         title_rect = title.get_rect(centerx=screen_center, centery=25)
 
         score_1 = score_font.render(f"1 - {high_scores[0]}", False, (255,255,255))
-        score_1_rect = score_1.get_rect(centerx=screen_center, centery=100)
-
+        score_1_rect = score_1.get_rect(x=150, y=100)
         score_2 = score_font.render(f"2 - {high_scores[1]}", False, (255,255,255))
-        score_2_rect = score_2.get_rect(centerx=screen_center, centery=150)
-
+        score_2_rect = score_2.get_rect(x=150, y=150)
         score_3 = score_font.render(f"3 - {high_scores[2]}", False, (255,255,255))
-        score_3_rect = score_3.get_rect(centerx=screen_center, centery=200)
-
+        score_3_rect = score_3.get_rect(x=150, y=200)
         score_4 = score_font.render(f"4 - {high_scores[3]}", False, (255,255,255))
-        score_4_rect = score_4.get_rect(centerx=screen_center, centery=250)
-
+        score_4_rect = score_4.get_rect(x=150, y=250)
         score_5 = score_font.render(f"5 - {high_scores[4]}", False, (255,255,255))
-        score_5_rect = score_5.get_rect(centerx=screen_center, centery=300)
-
+        score_5_rect = score_5.get_rect(x=150, y=300)
         score_6 = score_font.render(f"6 - {high_scores[5]}", False, (255,255,255))
-        score_6_rect = score_6.get_rect(centerx=screen_center, centery=350)
-
+        score_6_rect = score_6.get_rect(x=150, y=350)
         score_7 = score_font.render(f"7 - {high_scores[6]}", False, (255,255,255))
-        score_7_rect = score_7.get_rect(centerx=screen_center, centery=400)
-
+        score_7_rect = score_7.get_rect(x=150, y=400)
         score_8 = score_font.render(f"8 - {high_scores[7]}", False, (255,255,255))
-        score_8_rect = score_8.get_rect(centerx=screen_center, centery=450)
-
+        score_8_rect = score_8.get_rect(x=150, y=450)
         score_9 = score_font.render(f"9 - {high_scores[8]}", False, (255,255,255))
-        score_9_rect = score_9.get_rect(centerx=screen_center, centery=500)
-
+        score_9_rect = score_9.get_rect(x=150, y=500)
         score_10 = score_font.render(f"10 - {high_scores[9]}", False, (255,255,255))
-        score_10_rect = score_10.get_rect(centerx=screen_center, centery=550)
+        score_10_rect = score_10.get_rect(x=130, y=550)
+
+        score_11 = score_font.render(f"11 - {high_scores[10]}", False, (255,255,255))
+        score_11_rect = score_11.get_rect(x=500, y=100)
+        score_12 = score_font.render(f"12 - {high_scores[11]}", False, (255,255,255))
+        score_12_rect = score_11.get_rect(x=500, y=150)
+        score_13 = score_font.render(f"13 - {high_scores[12]}", False, (255,255,255))
+        score_13_rect = score_11.get_rect(x=500, y=200)
+        score_14 = score_font.render(f"14 - {high_scores[13]}", False, (255,255,255))
+        score_14_rect = score_11.get_rect(x=500, y=250)
+        score_15 = score_font.render(f"15 - {high_scores[14]}", False, (255,255,255))
+        score_15_rect = score_11.get_rect(x=500, y=300)
+        score_16 = score_font.render(f"16 - {high_scores[15]}", False, (255,255,255))
+        score_16_rect = score_11.get_rect(x=500, y=350)
+        score_17 = score_font.render(f"17 - {high_scores[16]}", False, (255,255,255))
+        score_17_rect = score_11.get_rect(x=500, y=400)
+        score_18 = score_font.render(f"18 - {high_scores[17]}", False, (255,255,255))
+        score_18_rect = score_11.get_rect(x=500, y=450)
+        score_19 = score_font.render(f"19 - {high_scores[18]}", False, (255,255,255))
+        score_19_rect = score_11.get_rect(x=500, y=500)
+        score_20 = score_font.render(f"20 - {high_scores[19]}", False, (255,255,255))
+        score_20_rect = score_20.get_rect(x=500, y=550)
 
 
         # event queue
+        keys = pygame.key.get_pressed()
         for event in pygame.event.get():
-            if event.type == pygame.K_ESCAPE:
+            if keys[pygame.K_TAB]:
                 main_menu()
             if event.type == pygame.QUIT:
                 sys.exit(0)
@@ -1004,7 +1017,17 @@ def leaderboard():
         screen.blit(score_7, score_7_rect.topleft)
         screen.blit(score_8, score_8_rect.topleft)
         screen.blit(score_9, score_9_rect.topleft)
-        screen.blit(score_10, score_10_rect.topleft) 
+        screen.blit(score_10, score_10_rect.topleft)
+        screen.blit(score_11, score_11_rect.topleft) 
+        screen.blit(score_12, score_12_rect.topleft)
+        screen.blit(score_13, score_13_rect.topleft)
+        screen.blit(score_14, score_14_rect.topleft)
+        screen.blit(score_15, score_15_rect.topleft)
+        screen.blit(score_16, score_16_rect.topleft)
+        screen.blit(score_17, score_17_rect.topleft)
+        screen.blit(score_18, score_18_rect.topleft)
+        screen.blit(score_19, score_19_rect.topleft)
+        screen.blit(score_20, score_20_rect.topleft)
 
 
         # refreshes screen, sets FPS
@@ -1064,7 +1087,7 @@ def loading():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
-            if keys[pygame.K_ESCAPE]:
+            if keys[pygame.K_TAB]:
                 running = False
 
 
