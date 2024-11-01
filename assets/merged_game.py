@@ -7,7 +7,7 @@ pygame.init()
 # create the screen, width/height
 screen = pygame.display.set_mode((800,600))
 
-
+ 
 # Title Caption and Icon
 pygame.display.set_caption("Group 9 Project: Galactic Invasion")
 icon = pygame.image.load("UI\\game_icon.png")
@@ -236,6 +236,7 @@ def game():
     global high_scores
     screen.fill((0,0,0))
     clock = pygame.time.Clock()
+    explode = False
 
 
     # UI
@@ -250,6 +251,7 @@ def game():
 
     # enemy class
     class Enemy(pygame.sprite.Sprite):
+        global explode
         # initializes the class, and info for all new objects
         def __init__(self):
             super().__init__()
@@ -296,6 +298,10 @@ def game():
                 bullet1.rect.y = -50
                 pygame.sprite.Sprite.kill(bullet1)
 
+            if explode:
+                self.exploding = True
+                explosion_sound.play()
+
             if self.exploding:
                 self.explode_step_index += 1
 
@@ -307,6 +313,7 @@ def game():
 
                 self.image = self.explosion[self.explode_step_index // 10]
                 self.image = pygame.transform.scale(self.image, (16 * 3, 16 * 3))
+
 
             # keeps enemy within bounds 
             if self.rect.x < 0 and not self.dir:
@@ -351,6 +358,7 @@ def game():
                     self.speed = 13.5
                 case _:
                     self.speed = 14
+
 
 
     # bullet class
@@ -551,6 +559,9 @@ def game():
                 case _:
                     self.speed = 17
 
+        def power_up(self):
+            self.exploding = True
+
 
     # power-up class
     class Powerup(pygame.sprite.Sprite):
@@ -579,8 +590,9 @@ def game():
 
     # chooses which power up to enable
     def choose_pwr_up():
+        global explode
         random_pwr = [1,2,3,4,5,6,7,8,9,10,11,12]
-        random_choose = random.choice(random_pwr)
+        random_choose = 3
 
         match random_choose:
             case 1:
@@ -588,7 +600,7 @@ def game():
             case 2:
                 bullet1.power_up()
             case 3:
-                pygame.sprite.Group.empty(sprite_group)
+                explode = True
             case 4:
                 player.power_up()
             case 5:
