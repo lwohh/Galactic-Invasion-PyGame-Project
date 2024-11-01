@@ -42,3 +42,5 @@ Keybinds:
 
 To-Do List:
 - Add persistent Scoreboard
+- Create loading screen
+- Create game end screen

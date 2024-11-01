@@ -13,6 +13,9 @@ pygame.display.set_caption("Group 9 Project: Galactic Invasion")
 icon = pygame.image.load("game_icon.png")
 pygame.display.set_icon(icon)
 
+high_scores = [0,0,0,0,0,0,0,0,0,0]
+
+
 
 # Main Menu Function
 def main_menu():
@@ -61,7 +64,7 @@ def main_menu():
         start_button = Button(315, 275, start_img, 1.5)
         start_button.draw()
         if start_button.clicked == True:
-            game()
+            loading()
 
         quit_button = Button(315, 425, quit_img, 1.5)
         quit_button.draw()
@@ -186,9 +189,12 @@ def paused():
         screen.blit(boss_instructions, boss_rect.topleft)
 
         # event queue for options menu
+        keys = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
+            if keys[pygame.K_ESCAPE]:
+                keep_run = False
                 
         pygame.display.flip()
         clock.tick(60)
@@ -196,6 +202,7 @@ def paused():
 
 # Main Game Function
 def game():
+    global high_scores
     # enemy class
     class Enemy(pygame.sprite.Sprite):
         # initializes the class, and info for all new objects
@@ -239,7 +246,13 @@ def game():
                 self.rect.y += self.jump
                 self.dir = False
             if self.rect.y > 600:
-                sys.exit(0)
+                for i in range(len(high_scores) - 1):
+                    if score > high_scores[i]:
+                        high_scores.insert(i, score)
+                        high_scores.pop()
+                        break
+                print(high_scores)
+                leaderboard()
             
             match level:
                 case 1:
@@ -388,7 +401,13 @@ def game():
                 self.rect.y += self.jump
                 self.dir = False
             if self.rect.y > 600:
-                sys.exit(0)
+                for i in range(len(high_scores) - 1):
+                    if score > high_scores[i]:
+                        high_scores.insert(i, score)
+                        high_scores.pop()
+                        break
+                print(high_scores)
+                leaderboard()
             
             match level:
                 case 1:
@@ -526,7 +545,7 @@ def game():
     boss_spawned = False
 
     pwr_down_event = pygame.event.custom_type()
-    pwr_down_time = 9000
+    pwr_down_time = 10000
     pygame.time.set_timer(pwr_down_event, pwr_down_time)
 
 
@@ -542,7 +561,7 @@ def game():
             screen.blit(level_2_bg, (0,0))
         if level == 3:
             screen.blit(level_3_bg, (0,0))
-        screen.blit(score_render, (5,545))
+        screen.blit(score_render, (5,560))
         screen.blit(level_render, (650, 560))
 
         keys = pygame.key.get_pressed()
@@ -552,7 +571,7 @@ def game():
                 sys.exit(0)
             if keys[pygame.K_ESCAPE]:
                 pygame.mixer.music.pause()
-                running = False
+                main_menu()
 
             # every 3.5 seconds a new enemy spawns on the event trigger
             if event.type == spawn_event:
@@ -563,9 +582,11 @@ def game():
                 spawn_timer -= 150
                 pygame.time.set_timer(spawn_event, spawn_timer)
 
-            # spawns in power up sprite
+            # spawns in power up sprite, resets random spawn timing so its different every time
             if event.type == pwr_up_event:
                 pwr_up_group.add(Powerup())
+                pwr_up_timer = random.randint(20000, 35000)
+                pygame.time.set_timer(pwr_up_event, pwr_up_timer)
             
             # removes power up abilities
             if event.type == pwr_down_event:
@@ -612,6 +633,7 @@ def game():
                 score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
                 enemy_defeat.play()
                 boss_spawned = False
+                bullet1.state = "ready"
                 hit_boss.clear()
         
         # checks power up collision
@@ -654,4 +676,153 @@ def game():
         pygame.display.flip()
         clock.tick(60)
 
+
+# Leaderboard Function
+def leaderboard():
+    global high_scores
+    clock = pygame.time.Clock()
+    pygame.mixer.music.pause()
+    running = True
+    while running:
+        screen_center = screen.get_width() // 2
+        screen.fill((0,0,0))
+
+        # leaderboard font
+        score_font = pygame.font.Font("monogram.ttf", 40)
+
+        # title font
+        title_font = pygame.font.Font("monogram.ttf", 64)
+
+        # back button image
+        back_img = pygame.image.load("UI - back.png").convert_alpha()
+
+
+        class Button():
+            def __init__(self, x, y, image, scale):
+                width = image.get_width()
+                height = image.get_height()
+                self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+                self.rect = self.image.get_rect()
+                self.rect.topleft = (x, y)
+                self.clicked = False
+
+            
+            def draw(self):
+                # draw button on screen
+                screen.blit(self.image, (self.rect.x, self.rect.y))
+
+                pos = pygame.mouse.get_pos()
+                if self.rect.collidepoint(pos):
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        self.clicked = True
+                    if pygame.mouse.get_pressed()[0] == 0:
+                        self.clicked = False
+
+
+        # leaderboard text
+        title = title_font.render("Galactic Invasion Leaderboard", False, (255,255,255))
+        title_rect = title.get_rect(centerx=screen_center, centery=25)
+
+        score_1 = score_font.render(f"1 - {high_scores[0]}", False, (255,255,255))
+        score_1_rect = score_1.get_rect(centerx=screen_center, centery=100)
+
+        score_2 = score_font.render(f"2 - {high_scores[1]}", False, (255,255,255))
+        score_2_rect = score_2.get_rect(centerx=screen_center, centery=150)
+
+        score_3 = score_font.render(f"3 - {high_scores[2]}", False, (255,255,255))
+        score_3_rect = score_3.get_rect(centerx=screen_center, centery=200)
+
+        score_4 = score_font.render(f"4 - {high_scores[3]}", False, (255,255,255))
+        score_4_rect = score_4.get_rect(centerx=screen_center, centery=250)
+
+        score_5 = score_font.render(f"5 - {high_scores[4]}", False, (255,255,255))
+        score_5_rect = score_5.get_rect(centerx=screen_center, centery=300)
+
+        score_6 = score_font.render(f"6 - {high_scores[5]}", False, (255,255,255))
+        score_6_rect = score_6.get_rect(centerx=screen_center, centery=350)
+
+        score_7 = score_font.render(f"7 - {high_scores[6]}", False, (255,255,255))
+        score_7_rect = score_7.get_rect(centerx=screen_center, centery=400)
+
+        score_8 = score_font.render(f"8 - {high_scores[7]}", False, (255,255,255))
+        score_8_rect = score_8.get_rect(centerx=screen_center, centery=450)
+
+        score_9 = score_font.render(f"9 - {high_scores[8]}", False, (255,255,255))
+        score_9_rect = score_9.get_rect(centerx=screen_center, centery=500)
+
+        score_10 = score_font.render(f"10 - {high_scores[9]}", False, (255,255,255))
+        score_10_rect = score_10.get_rect(centerx=screen_center, centery=550)
+
+        for event in pygame.event.get():
+            if event.type == pygame.K_ESCAPE:
+                main_menu()
+            if event.type == pygame.QUIT:
+                sys.exit(0)
+        
+        back_button = Button(20, 550, back_img, 1.0)
+        back_button.draw()
+        if back_button.clicked == True:
+            main_menu()
+
+        screen.blit(title, title_rect)
+        screen.blit(score_1, score_1_rect.topleft)
+        screen.blit(score_2, score_2_rect.topleft)
+        screen.blit(score_3, score_3_rect.topleft)
+        screen.blit(score_4, score_4_rect.topleft)
+        screen.blit(score_5, score_5_rect.topleft)
+        screen.blit(score_6, score_6_rect.topleft)
+        screen.blit(score_7, score_7_rect.topleft)
+        screen.blit(score_8, score_8_rect.topleft)
+        screen.blit(score_9, score_9_rect.topleft)
+        screen.blit(score_10, score_10_rect.topleft) 
+        pygame.display.flip()
+        clock.tick(60)
+
+
+# Loading Function
+def loading():
+    screen_center = screen.get_width() // 2
+    screen_mid = screen.get_height() // 2
+    clock = pygame.time.Clock()
+    screen.fill((0,0,0))
+
+    class loading_animate(pygame.sprite.Sprite):
+        # initializes the class, and info for all new objects
+        def __init__(self):
+            super().__init__()
+            self.images = [pygame.image.load("loading_1.png"),pygame.image.load("loading_2.png"),pygame.image.load("loading_3.png"),pygame.image.load("loading_4.png"),pygame.image.load("loading_5.png"),pygame.image.load("loading_6.png"),pygame.image.load("loading_7.png"),pygame.image.load("loading_8.png"),pygame.image.load("loading_9.png"),pygame.image.load("loading_10.png")]
+            self.step_index = 0
+            self.image = self.images[self.step_index]
+            self.image = pygame.transform.scale(self.image, (35 * 9, 16 * 9))
+            # using list for coords
+            self.rect = self.image.get_rect(center=(screen_center,screen_mid))
+    
+        def update(self):
+            # animating sprite
+            self.image = self.images[self.step_index // 10]
+            self.image = pygame.transform.scale(self.image, (35 * 9, 16 * 9))
+            self.step_index += 1
+            # resets animation index
+            if self.step_index >= 90:
+                game()
+    
+    loading_group = pygame.sprite.Group()
+    loading_group.add(loading_animate())
+
+    running = True
+    while running:
+        keys = pygame.key.get_pressed()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit(0)
+            if keys[pygame.K_ESCAPE]:
+                running = False
+
+        loading_group.draw(screen)
+        loading_group.update()
+        
+        pygame.display.flip()
+        clock.tick(60)
+
+# begins game
 main_menu()
