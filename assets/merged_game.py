@@ -78,17 +78,17 @@ def main_menu():
         # button instances
         start_button = Button(315, 275, start_img, 1.5)
         start_button.draw()
-        if start_button.clicked == True:
+        if start_button.clicked:
             loading()
 
         quit_button = Button(315, 425, quit_img, 1.5)
         quit_button.draw()
-        if quit_button.clicked == True:
+        if quit_button.clicked:
             sys.exit(0)
         
         options_button = Button(315, 350, options_img, 1.5)
         options_button.draw()
-        if options_button.clicked == True:
+        if options_button.clicked:
             paused()
 
 
@@ -821,7 +821,10 @@ def game():
 
 
         # changes level every 20 score
-        if score >= 20 and score < 40:
+        if score >= 0 and score < 20:
+            level = 1
+            level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+        elif score >= 20 and score < 40:
             level = 2
             level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
         elif score >= 40 and score < 60:
@@ -1004,8 +1007,6 @@ def loading():
     screen_center = screen.get_width() // 2
     screen_mid = screen.get_height() // 2
     clock = pygame.time.Clock()
-    background = pygame.image.load("backgrounds\\background_two.png")
-    background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
 
 
     # loading animation class
