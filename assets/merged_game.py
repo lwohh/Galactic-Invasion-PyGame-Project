@@ -29,11 +29,14 @@ def main_menu():
         screen_center = screen.get_width() // 2
         screen.blit(background, (0,0))
         # font used for main menu text
-        title_font = pygame.font.Font("monogram.ttf", 60)
+        title_font = pygame.font.Font("GravityRegular5.ttf", 28)
 
         # game title text
-        title_text = title_font.render("Group 9 Project: Galactic Invasion", False, (255,255,255))
+        title_text = title_font.render("Group 9 Project:", False, (255,255,255))
         title_rect = title_text.get_rect(centerx=screen_center, centery=100)
+
+        title_text_2 = title_font.render("Galactic Invasion", False, (255,255,255))
+        title_rect_2 = title_text_2.get_rect(centerx=screen_center, centery=150)
 
         # button images
         start_img = pygame.image.load("UI - start.png").convert_alpha()
@@ -81,6 +84,7 @@ def main_menu():
 
         # blitting title text to screen
         screen.blit(title_text, title_rect.topleft)
+        screen.blit(title_text_2, title_rect_2.topleft)
 
         # key and event queue for main menu
         keys = pygame.key.get_pressed()
@@ -110,7 +114,7 @@ def paused():
         screen.blit(background, (0,0))
 
         # options menu font
-        pause_font = pygame.font.Font("monogram.ttf", 30)
+        pause_font = pygame.font.Font("GravityRegular5.ttf", 13)
 
         # button image
         back_img = pygame.image.load("UI - back.png").convert_alpha()
@@ -205,6 +209,16 @@ def paused():
 # Main Game Function
 def game():
     global high_scores
+
+    # UI
+    score = 0
+    score_font = pygame.font.Font("GravityRegular5.ttf", 18)
+    score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
+
+    level = 1
+    level_font = pygame.font.Font("GravityRegular5.ttf", 18)
+    level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+
     # enemy class
     class Enemy(pygame.sprite.Sprite):
         # initializes the class, and info for all new objects
@@ -223,13 +237,18 @@ def game():
             self.directions = [True, False]
             self.dir = random.choice(self.directions)
             self.jump = 40
-    
+
+            self.explosion = [pygame.image.load("explosion_1.png"), pygame.image.load("explosion_2.png"),pygame.image.load("explosion_3.png"),pygame.image.load("explosion_4.png"),pygame.image.load("explosion_5.png")]
+            self.explode_step_index = 0
+
+            self.rect = self.image.get_rect(center=(self.pos[0],self.pos[1]))
+            self.exploding = False
         # enemy movement method
         def update(self):
             # moves enemy left and right depending on random direction from self.dir
-            if not self.dir:
+            if not self.dir and not self.exploding:
                 self.rect.x -= self.speed
-            if self.dir:
+            if self.dir and not self.exploding:
                 self.rect.x += self.speed
             
             # animating sprite
@@ -239,7 +258,21 @@ def game():
             # resets animation index
             if self.step_index >= 40:
                 self.step_index = 0
-        
+
+            if pygame.sprite.collide_rect(self, bullet1):
+                self.exploding = True
+
+            if self.exploding:
+                self.explode_step_index += 1
+
+                if self.explode_step_index >= 40:
+                    self.exploding = False
+                    pygame.sprite.Sprite.add(self, hit_list)
+                    
+
+                self.image = self.explosion[self.explode_step_index // 10]
+                self.image = pygame.transform.scale(self.image, (16 * 3, 16 * 3))
+
             # keeps enemy within bounds 
             if self.rect.x < 0 and not self.dir:
                 self.rect.y += self.jump
@@ -573,15 +606,7 @@ def game():
 
     pwr_up_group = pygame.sprite.Group()
 
-
-    # UI
-    score = 0
-    score_font = pygame.font.Font("monogram.ttf", 48)
-    score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
-
-    level = 1
-    level_font = pygame.font.Font("monogram.ttf", 48)
-    level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+    hit_list = pygame.sprite.Group()
 
 
     # timed events, enemy spawning, faster spawning
@@ -643,8 +668,8 @@ def game():
             case 12:
                 screen.blit(level_12_bg, (0,0))
             
-        screen.blit(score_render, (5,560))
-        screen.blit(level_render, (650, 560))
+        screen.blit(score_render, (25,560))
+        screen.blit(level_render, (635, 560))
 
         keys = pygame.key.get_pressed()
         # every event gets logged below and you loop through each event, like keystrokes
@@ -694,16 +719,17 @@ def game():
             bullet1.state = "ready"    
 
         # checks if anything in bullet group collides with enemies, if so the enemy and bullet are deleted from groups
-        hit_list = pygame.sprite.groupcollide(bullet_group, sprite_group, True, True)
+        #hit_list = pygame.sprite.groupcollide(bullet_group, sprite_group, True, True)
 
         # checks if sprites are in the hit_list group, if so, score +1, clears group
+        
         if hit_list:
             for i in range(len(hit_list)):
                 score += 1
                 score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
                 enemy_defeat.play()
                 bullet1.state = "ready"
-                hit_list.clear()
+                pygame.sprite.Group.empty(hit_list)
         
         # checks for collision with boss, if so, deletes boss and bullet
         hit_boss = pygame.sprite.groupcollide(bullet_group, boss_group, True, True)
@@ -774,10 +800,10 @@ def leaderboard():
         screen.blit(background, (0,0))
 
         # leaderboard font
-        score_font = pygame.font.Font("monogram.ttf", 40)
+        score_font = pygame.font.Font("GravityRegular5.ttf", 20)
 
         # title font
-        title_font = pygame.font.Font("monogram.ttf", 64)
+        title_font = pygame.font.Font("GravityRegular5.ttf", 26)
 
         # back button image
         back_img = pygame.image.load("UI - back.png").convert_alpha()
@@ -897,9 +923,9 @@ def loading():
     loading_group = pygame.sprite.Group()
     loading_group.add(loading_animate())
 
-    loading_font = pygame.font.Font("monogram.ttf", 48)
+    loading_font = pygame.font.Font("GravityRegular5.ttf", 24)
     loading_text = loading_font.render("Loading...", False, (255,255,255))
-    loading_rect = loading_text.get_rect(centerx=screen_center,centery=screen_mid + 50)
+    loading_rect = loading_text.get_rect(centerx=screen_center,centery=screen_mid + 60)
 
     running = True
     while running:
