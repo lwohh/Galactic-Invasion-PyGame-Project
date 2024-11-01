@@ -10,26 +10,27 @@ screen = pygame.display.set_mode((800,600))
 
 # Title Caption and Icon
 pygame.display.set_caption("Group 9 Project: Galactic Invasion")
-icon = pygame.image.load("game_icon.png")
+icon = pygame.image.load("UI\\game_icon.png")
 pygame.display.set_icon(icon)
 
+# List containing top 10 scores for current game instance, resets once game is FULLY closed
 high_scores = [0,0,0,0,0,0,0,0,0,0]
-
 
 
 # Main Menu Function
 def main_menu():
+    screen.fill((0,0,0))
     clock = pygame.time.Clock()
     run = True
     pygame.mixer.music.pause()
-    background = pygame.image.load("background_two.png")
+    background = pygame.image.load("backgrounds\\background_two.png")
     background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
 
     while run:
         screen_center = screen.get_width() // 2
         screen.blit(background, (0,0))
         # font used for main menu text
-        title_font = pygame.font.Font("GravityRegular5.ttf", 28)
+        title_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 28)
 
         # game title text
         title_text = title_font.render("Group 9 Project:", False, (255,255,255))
@@ -39,9 +40,9 @@ def main_menu():
         title_rect_2 = title_text_2.get_rect(centerx=screen_center, centery=150)
 
         # button images
-        start_img = pygame.image.load("UI - start.png").convert_alpha()
-        quit_img = pygame.image.load("UI - quit.png").convert_alpha()
-        options_img = pygame.image.load("UI - options.png").convert_alpha()
+        start_img = pygame.image.load("UI\\UI - start.png").convert_alpha()
+        quit_img = pygame.image.load("UI\\UI - quit.png").convert_alpha()
+        options_img = pygame.image.load("UI\\UI - options.png").convert_alpha()
 
         # button class
         class Button():
@@ -102,11 +103,12 @@ def main_menu():
 
 # Options Menu Function
 def paused():
+    screen.fill((0,0,0))
     clock = pygame.time.Clock()
     keep_run = True
     pygame.mixer.music.pause()
 
-    background = pygame.image.load("background_two.png")
+    background = pygame.image.load("backgrounds\\background_two.png")
     background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
 
     while keep_run:
@@ -114,10 +116,10 @@ def paused():
         screen.blit(background, (0,0))
 
         # options menu font
-        pause_font = pygame.font.Font("GravityRegular5.ttf", 13)
+        pause_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 13)
 
         # button image
-        back_img = pygame.image.load("UI - back.png").convert_alpha()
+        back_img = pygame.image.load("UI\\UI - back.png").convert_alpha()
 
         # button class
         class Button():
@@ -209,14 +211,15 @@ def paused():
 # Main Game Function
 def game():
     global high_scores
+    screen.fill((0,0,0))
 
     # UI
     score = 0
-    score_font = pygame.font.Font("GravityRegular5.ttf", 18)
+    score_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 18)
     score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
 
     level = 1
-    level_font = pygame.font.Font("GravityRegular5.ttf", 18)
+    level_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 18)
     level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
 
     # enemy class
@@ -227,7 +230,7 @@ def game():
             self.speed = 8
             self.name = "enemy"
             self.damage = 5
-            self.images = [pygame.image.load("enemy.png"), pygame.image.load("enemy_2.png")]
+            self.images = [pygame.image.load("assets\\enemy.png"), pygame.image.load("assets\\enemy_2.png")]
             self.step_index = 0
             self.image = self.images[0]
             self.image = pygame.transform.scale(self.image, (16 * 3, 16 * 3))
@@ -238,7 +241,7 @@ def game():
             self.dir = random.choice(self.directions)
             self.jump = 40
 
-            self.explosion = [pygame.image.load("explosion_1.png"), pygame.image.load("explosion_2.png"),pygame.image.load("explosion_3.png"),pygame.image.load("explosion_4.png"),pygame.image.load("explosion_5.png")]
+            self.explosion = [pygame.image.load("assets\\explosion_1.png"), pygame.image.load("assets\\explosion_2.png"),pygame.image.load("assets\\explosion_3.png"),pygame.image.load("assets\\explosion_4.png"),pygame.image.load("assets\\explosion_5.png")]
             self.explode_step_index = 0
 
             self.rect = self.image.get_rect(center=(self.pos[0],self.pos[1]))
@@ -261,6 +264,11 @@ def game():
 
             if pygame.sprite.collide_rect(self, bullet1):
                 self.exploding = True
+                explosion_sound.play()
+                bullet1.state = "ready"
+                bullet1.rect.x = -50
+                bullet1.rect.y = -50
+                pygame.sprite.Sprite.kill(bullet1)
 
             if self.exploding:
                 self.explode_step_index += 1
@@ -268,6 +276,7 @@ def game():
                 if self.explode_step_index >= 40:
                     self.exploding = False
                     pygame.sprite.Sprite.add(self, hit_list)
+                    pygame.sprite.Sprite.remove(self, sprite_group)
                     
 
                 self.image = self.explosion[self.explode_step_index // 10]
@@ -315,6 +324,7 @@ def game():
                 case 12:
                     self.speed = 13.5
 
+
     # bullet class
     class bullet(pygame.sprite.Sprite):
         # initializes bullet class and variables for all bullet objects
@@ -323,10 +333,10 @@ def game():
             self.speed = 10
             self.old_speed = 10
             self.name = "bullet"
-            self.x = 0
-            self.y = 0
+            self.x = -50
+            self.y = -50
             self.pwr_up = False
-            self.images = [pygame.image.load("laser_f_1.png"), pygame.image.load("laser_f_2.png")]
+            self.images = [pygame.image.load("assets\\laser_f_1.png"), pygame.image.load("assets\\laser_f_2.png")]
             
             self.step_index = 0
             self.image = self.images[self.step_index]
@@ -366,11 +376,11 @@ def game():
             super().__init__()
             self.speed = 10
             self.name = "player"
-            self.left = [pygame.image.load("ship_f_1.png"), pygame.image.load("ship_f_11.png")]
+            self.left = [pygame.image.load("assets\\ship_f_1.png"), pygame.image.load("assets\\ship_f_11.png")]
             
-            self.right = [pygame.image.load("ship_f_5.png"), pygame.image.load("ship_f_55.png")]
+            self.right = [pygame.image.load("assets\\ship_f_5.png"), pygame.image.load("assets\\ship_f_55.png")]
             
-            self.idle = [pygame.image.load("ship_f_3.png"), pygame.image.load("ship_f_33.png")]
+            self.idle = [pygame.image.load("assets\\ship_f_3.png"), pygame.image.load("assets\\ship_f_33.png")]
 
             self.step_index = 0
             self.image = self.idle[0]
@@ -408,7 +418,6 @@ def game():
         def power_up(self):
             if self.pwr_up == False:
                 self.speed += 5
-                print("power_Up")
                 self.pwr_up = True
 
 
@@ -420,23 +429,28 @@ def game():
             self.speed = 10
             self.name = "enemy"
             self.damage = 5
-            self.images = [pygame.image.load("boss_1.png"), pygame.image.load("boss_2.png")]
+            self.images = [pygame.image.load("assets\\boss_1.png"), pygame.image.load("assets\\boss_2.png")]
             self.step_index = 0
             self.image = self.images[0]
             self.image = pygame.transform.scale(self.image, (32 * 3, 32 * 3))
             # using list for coords
-            self.pos = [random.randint(0,736), random.randint(25,50)]
+
+            self.explosion = [pygame.image.load("assets\\explosion_1.png"), pygame.image.load("assets\\explosion_2.png"),pygame.image.load("assets\\explosion_3.png"),pygame.image.load("assets\\explosion_4.png"),pygame.image.load("assets\\explosion_5.png")]
+            self.explode_step_index = 0
+
+            self.pos = [random.randint(0,736), random.randint(75,100)]
             self.rect = self.image.get_rect(center=(self.pos[0],self.pos[1]))
             self.directions = [True, False]
             self.dir = random.choice(self.directions)
             self.jump = 80
+            self.exploding = False
     
         # enemy movement method
         def update(self):
             # moves enemy left and right depending on random direction from self.dir
-            if not self.dir:
+            if not self.dir and not self.exploding:
                 self.rect.x -= self.speed
-            if self.dir:
+            if self.dir and not self.exploding:
                 self.rect.x += self.speed
             
             self.image = self.images[self.step_index//20]
@@ -444,6 +458,26 @@ def game():
             self.step_index += 1
             if self.step_index >= 40:
                 self.step_index = 0
+            
+            if pygame.sprite.collide_rect(self, bullet1):
+                self.exploding = True
+                explosion_sound.play()
+                bullet1.state = "ready"
+                bullet1.rect.x = -50
+                bullet1.rect.y = -50
+                pygame.sprite.Sprite.kill(bullet1)
+
+            if self.exploding:
+                self.explode_step_index += 1
+
+                if self.explode_step_index >= 40:
+                    self.exploding = False
+                    pygame.sprite.Sprite.add(self, hit_boss)
+                    pygame.sprite.Sprite.remove(self, boss_group)
+                    
+
+                self.image = self.explosion[self.explode_step_index // 10]
+                self.image = pygame.transform.scale(self.image, (16 * 6, 16 * 6))
         
             # keeps enemy within bounds 
             if self.rect.x < 0 and not self.dir:
@@ -494,7 +528,7 @@ def game():
             super().__init__()
             self.speed = 4
             self.pos = [random.randint(0,700), random.randint(10,30)]
-            self.animate = [pygame.image.load("pwr_up_f_1.png"), pygame.image.load("pwr_up_f_2.png")]
+            self.animate = [pygame.image.load("assets\\pwr_up_f_1.png"), pygame.image.load("assets\\pwr_up_f_2.png")]
             self.step_index = 0
             self.image = self.animate[self.step_index]
             self.image = pygame.transform.scale(self.image, (16*2, 16*2))
@@ -548,47 +582,50 @@ def game():
     clock = pygame.time.Clock()
 
     # background image
-    background = pygame.image.load("background_four.png")
+    background = pygame.image.load("backgrounds\\background_four.png")
     background = pygame.transform.scale(background, (640 * 1.75, 360 * 1.75))
-    level_2_bg = pygame.image.load("Background_space.png")
-    level_3_bg = pygame.image.load("bg_3.png")
-    level_4_bg = pygame.image.load("background_two.png")
+    level_2_bg = pygame.image.load("backgrounds\\Background_space.png")
+    level_3_bg = pygame.image.load("backgrounds\\bg_3.png")
+    level_4_bg = pygame.image.load("backgrounds\\background_two.png")
     level_4_bg = pygame.transform.scale(level_4_bg, (816 * 1.25, 480 * 1.25))
-    level_5_bg = pygame.image.load("background_five.png")
+    level_5_bg = pygame.image.load("backgrounds\\background_five.png")
     level_5_bg = pygame.transform.scale(level_5_bg, (272 * 3.75, 160 * 3.75))
 
-    level_6_bg = pygame.image.load("background_six.png")
+    level_6_bg = pygame.image.load("backgrounds\\background_six.png")
     level_6_bg = pygame.transform.scale(level_6_bg, (272 * 3.75, 160 * 3.75))
 
-    level_7_bg = pygame.image.load("background_seven.png")
+    level_7_bg = pygame.image.load("backgrounds\\background_seven.png")
     level_7_bg = pygame.transform.scale(level_7_bg, (272 * 3.75, 160 * 3.75))
 
-    level_8_bg = pygame.image.load("background_eight.png")
+    level_8_bg = pygame.image.load("backgrounds\\background_eight.png")
     level_8_bg = pygame.transform.scale(level_8_bg, (272 * 3.75, 160 * 3.75))
 
-    level_9_bg = pygame.image.load("background_nine.png")
+    level_9_bg = pygame.image.load("backgrounds\\background_nine.png")
     level_9_bg = pygame.transform.scale(level_9_bg, (272 * 3.75, 160 * 3.75))
 
-    level_10_bg = pygame.image.load("background_ten.png")
+    level_10_bg = pygame.image.load("backgrounds\\background_ten.png")
     level_10_bg = pygame.transform.scale(level_10_bg, (272 * 3.75, 160 * 3.75))
 
-    level_11_bg = pygame.image.load("background_eleven.png")
+    level_11_bg = pygame.image.load("backgrounds\\background_eleven.png")
     level_11_bg = pygame.transform.scale(level_11_bg, (272 * 3.75, 160 * 3.75))
 
-    level_12_bg = pygame.image.load("background_twelve.png")
+    level_12_bg = pygame.image.load("backgrounds\\background_twelve.png")
     level_12_bg = pygame.transform.scale(level_12_bg, (272 * 3.75, 160 * 3.75))
     
 
     # sounds
-    pygame.mixer.music.load("Mecha Collection.wav")
+    pygame.mixer.music.load("sounds\\Mecha Collection.wav")
     pygame.mixer.music.set_volume(0.10)
     pygame.mixer.music.play(-1)
 
-    new_level = pygame.mixer.Sound("new_level.wav")
+    new_level = pygame.mixer.Sound("sounds\\new_level.wav")
     new_level.set_volume(0.25)
 
-    enemy_defeat = pygame.mixer.Sound("enemy_defeat.wav")
+    enemy_defeat = pygame.mixer.Sound("sounds\\enemy_defeat.wav")
     enemy_defeat.set_volume(0.10)
+
+    explosion_sound = pygame.mixer.Sound("sounds\\explosion_sound.wav")
+    explosion_sound.set_volume(0.05)
 
 
     # sprite groups from classes for enemy, player, bullet, boss, powerup
@@ -607,6 +644,8 @@ def game():
     pwr_up_group = pygame.sprite.Group()
 
     hit_list = pygame.sprite.Group()
+
+    hit_boss = pygame.sprite.Group()
 
 
     # timed events, enemy spawning, faster spawning
@@ -722,27 +761,26 @@ def game():
         #hit_list = pygame.sprite.groupcollide(bullet_group, sprite_group, True, True)
 
         # checks if sprites are in the hit_list group, if so, score +1, clears group
-        
+
         if hit_list:
             for i in range(len(hit_list)):
                 score += 1
                 score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
                 enemy_defeat.play()
-                bullet1.state = "ready"
                 pygame.sprite.Group.empty(hit_list)
         
         # checks for collision with boss, if so, deletes boss and bullet
-        hit_boss = pygame.sprite.groupcollide(bullet_group, boss_group, True, True)
+        #hit_boss = pygame.sprite.groupcollide(bullet_group, boss_group, True, True)
 
         # checks if sprites are in the hit_boss, if so, score +1, clears group
         if hit_boss:
+            pygame.sprite.Group.empty(bullet_group)
             for i in range(len(hit_boss)):
                 score += 1
                 score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
                 enemy_defeat.play()
                 boss_spawned = False
-                bullet1.state = "ready"
-                hit_boss.clear()
+                pygame.sprite.Group.empty(hit_boss)
         
         # checks power up collision
         pwr_list = pygame.sprite.groupcollide(player_group, pwr_up_group, False, True)
@@ -767,6 +805,30 @@ def game():
         elif score >= 60 and score < 80:
             level = 4
             level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+        elif score >= 80 and score < 100:
+            level = 5
+            level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+        elif score >= 100 and score < 120:
+            level = 6
+            level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+        elif score >= 120 and score < 140:
+            level = 7
+            level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+        elif score >= 140 and score < 160:
+            level = 8
+            level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+        elif score >= 160 and score < 180:
+            level = 9
+            level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+        elif score >= 180 and score < 200:
+            level = 10
+            level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+        elif score >= 200 and score < 220:
+            level = 11
+            level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+        elif score >= 220 and score < 240:
+            level = 12
+            level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
 
         # .draw is the same as blitting, draws everything in the groups to the screen and activates the update() methods on each group
         sprite_group.draw(screen)
@@ -788,8 +850,9 @@ def game():
 # Leaderboard Function
 def leaderboard():
     global high_scores
+    screen.fill((0,0,0))
 
-    background = pygame.image.load("background_two.png")
+    background = pygame.image.load("backgrounds\\background_two.png")
     background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
 
     clock = pygame.time.Clock()
@@ -800,13 +863,13 @@ def leaderboard():
         screen.blit(background, (0,0))
 
         # leaderboard font
-        score_font = pygame.font.Font("GravityRegular5.ttf", 20)
+        score_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 20)
 
         # title font
-        title_font = pygame.font.Font("GravityRegular5.ttf", 26)
+        title_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 26)
 
         # back button image
-        back_img = pygame.image.load("UI - back.png").convert_alpha()
+        back_img = pygame.image.load("UI\\UI - back.png").convert_alpha()
 
 
         class Button():
@@ -893,18 +956,19 @@ def leaderboard():
 
 # Loading Function
 def loading():
+    screen.fill((0,0,0))
     screen_center = screen.get_width() // 2
     screen_mid = screen.get_height() // 2
     clock = pygame.time.Clock()
 
-    background = pygame.image.load("background_two.png")
+    background = pygame.image.load("backgrounds\\background_two.png")
     background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
 
     class loading_animate(pygame.sprite.Sprite):
         # initializes the class, and info for all new objects
         def __init__(self):
             super().__init__()
-            self.images = [pygame.image.load("loading_1.png"),pygame.image.load("loading_2.png"),pygame.image.load("loading_3.png"),pygame.image.load("loading_4.png"),pygame.image.load("loading_5.png"),pygame.image.load("loading_6.png"),pygame.image.load("loading_7.png"),pygame.image.load("loading_8.png"),pygame.image.load("loading_9.png"),pygame.image.load("loading_10.png")]
+            self.images = [pygame.image.load("UI\\loading_1.png"),pygame.image.load("UI\\loading_2.png"),pygame.image.load("UI\\loading_3.png"),pygame.image.load("UI\\loading_4.png"),pygame.image.load("UI\\loading_5.png"),pygame.image.load("UI\\loading_6.png"),pygame.image.load("UI\\loading_7.png"),pygame.image.load("UI\\loading_8.png"),pygame.image.load("UI\\loading_9.png"),pygame.image.load("UI\\loading_10.png")]
             self.step_index = 0
             self.image = self.images[self.step_index]
             self.image = pygame.transform.scale(self.image, (35 * 9, 16 * 9))
@@ -923,7 +987,7 @@ def loading():
     loading_group = pygame.sprite.Group()
     loading_group.add(loading_animate())
 
-    loading_font = pygame.font.Font("GravityRegular5.ttf", 24)
+    loading_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 24)
     loading_text = loading_font.render("Loading...", False, (255,255,255))
     loading_rect = loading_text.get_rect(centerx=screen_center,centery=screen_mid + 60)
 
