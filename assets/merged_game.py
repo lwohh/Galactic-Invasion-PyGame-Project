@@ -19,18 +19,25 @@ high_scores = [0,0,0,0,0,0,0,0,0,0]
 
 # Main Menu Function
 def main_menu():
+    # scene setup, basic variables and debug
     screen.fill((0,0,0))
     clock = pygame.time.Clock()
-    run = True
     pygame.mixer.music.pause()
     background = pygame.image.load("backgrounds\\background_two.png")
     background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
 
+
+    # main loop
+    run = True
     while run:
+        # sets screen and finds screen center
         screen_center = screen.get_width() // 2
         screen.blit(background, (0,0))
+
+
         # font used for main menu text
         title_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 28)
+
 
         # game title text
         title_text = title_font.render("Group 9 Project:", False, (255,255,255))
@@ -38,6 +45,7 @@ def main_menu():
 
         title_text_2 = title_font.render("Galactic Invasion", False, (255,255,255))
         title_rect_2 = title_text_2.get_rect(centerx=screen_center, centery=150)
+
 
         # button images
         start_img = pygame.image.load("UI\\UI - start.png").convert_alpha()
@@ -83,13 +91,14 @@ def main_menu():
         if options_button.clicked == True:
             paused()
 
+
         # blitting title text to screen
         screen.blit(title_text, title_rect.topleft)
         screen.blit(title_text_2, title_rect_2.topleft)
 
+
         # key and event queue for main menu
         keys = pygame.key.get_pressed()
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
@@ -97,29 +106,36 @@ def main_menu():
                 sys.exit(0)
                 
 
+        # refreshes screen, sets FPS
         pygame.display.flip()
         clock.tick(60)
 
 
 # Options Menu Function
 def paused():
+    # scene setup, basic variables, debug
     screen.fill((0,0,0))
     clock = pygame.time.Clock()
-    keep_run = True
     pygame.mixer.music.pause()
-
     background = pygame.image.load("backgrounds\\background_two.png")
     background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
 
+
+    # main loop
+    keep_run = True
     while keep_run:
+        # sets background and finds screen center
         screen_center = screen.get_width() // 2
         screen.blit(background, (0,0))
+
 
         # options menu font
         pause_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 13)
 
+
         # button image
         back_img = pygame.image.load("UI\\UI - back.png").convert_alpha()
+
 
         # button class
         class Button():
@@ -143,11 +159,13 @@ def paused():
                     if pygame.mouse.get_pressed()[0] == 0:
                         self.clicked = False
 
+
         # creating button
         back_button = Button(20, 550, back_img, 1.0)
         back_button.draw()
         if back_button.clicked == True:
             keep_run = False
+
 
         # options menu text
         instructions_one = pause_font.render("Game Instructions", False, (255,255,255))
@@ -183,6 +201,7 @@ def paused():
         boss_instructions = pause_font.render("Bosses will spawn once at levels 20, 40, 60, etc.", False, (255,255,255))
         boss_rect = boss_instructions.get_rect(centerx=screen_center, centery=520)
 
+
         # blitting options text to screen
         screen.blit(instructions_one, one_rect.topleft)
         screen.blit(instructions_two, two_rect.topleft)
@@ -196,6 +215,7 @@ def paused():
         screen.blit(instructions_nine, nine_rect.topleft)
         screen.blit(boss_instructions, boss_rect.topleft)
 
+
         # event queue for options menu
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
@@ -204,14 +224,19 @@ def paused():
             if keys[pygame.K_ESCAPE]:
                 keep_run = False
                 
+
+        # refreshes screen and sets FPS
         pygame.display.flip()
         clock.tick(60)
 
 
 # Main Game Function
 def game():
+    # setting global variables, classes, etc
     global high_scores
     screen.fill((0,0,0))
+    clock = pygame.time.Clock()
+
 
     # UI
     score = 0
@@ -221,6 +246,7 @@ def game():
     level = 1
     level_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 18)
     level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
+
 
     # enemy class
     class Enemy(pygame.sprite.Sprite):
@@ -579,9 +605,7 @@ def game():
                 player.power_up()
 
 
-    clock = pygame.time.Clock()
-
-    # background image
+    # background images, need to transform some due to size limitations
     background = pygame.image.load("backgrounds\\background_four.png")
     background = pygame.transform.scale(background, (640 * 1.75, 360 * 1.75))
     level_2_bg = pygame.image.load("backgrounds\\Background_space.png")
@@ -590,25 +614,18 @@ def game():
     level_4_bg = pygame.transform.scale(level_4_bg, (816 * 1.25, 480 * 1.25))
     level_5_bg = pygame.image.load("backgrounds\\background_five.png")
     level_5_bg = pygame.transform.scale(level_5_bg, (272 * 3.75, 160 * 3.75))
-
     level_6_bg = pygame.image.load("backgrounds\\background_six.png")
     level_6_bg = pygame.transform.scale(level_6_bg, (272 * 3.75, 160 * 3.75))
-
     level_7_bg = pygame.image.load("backgrounds\\background_seven.png")
     level_7_bg = pygame.transform.scale(level_7_bg, (272 * 3.75, 160 * 3.75))
-
     level_8_bg = pygame.image.load("backgrounds\\background_eight.png")
     level_8_bg = pygame.transform.scale(level_8_bg, (272 * 3.75, 160 * 3.75))
-
     level_9_bg = pygame.image.load("backgrounds\\background_nine.png")
     level_9_bg = pygame.transform.scale(level_9_bg, (272 * 3.75, 160 * 3.75))
-
     level_10_bg = pygame.image.load("backgrounds\\background_ten.png")
     level_10_bg = pygame.transform.scale(level_10_bg, (272 * 3.75, 160 * 3.75))
-
     level_11_bg = pygame.image.load("backgrounds\\background_eleven.png")
     level_11_bg = pygame.transform.scale(level_11_bg, (272 * 3.75, 160 * 3.75))
-
     level_12_bg = pygame.image.load("backgrounds\\background_twelve.png")
     level_12_bg = pygame.transform.scale(level_12_bg, (272 * 3.75, 160 * 3.75))
     
@@ -670,6 +687,7 @@ def game():
     # checks if boss is spawned
     boss_spawned = False
 
+    # removes power up abilities after set time
     pwr_down_event = pygame.event.custom_type()
     pwr_down_time = 10000
     pygame.time.set_timer(pwr_down_event, pwr_down_time)
@@ -680,7 +698,7 @@ def game():
     while running:
         # background screen color update
         screen.fill((128, 128, 128))
-        # Background Image
+        # Background Images
         match level:
             case 1:
                 screen.blit(background, (0,0))
@@ -707,11 +725,14 @@ def game():
             case 12:
                 screen.blit(level_12_bg, (0,0))
             
+
+        # displaying UI
         screen.blit(score_render, (25,560))
         screen.blit(level_render, (635, 560))
 
+
+        # main event queue
         keys = pygame.key.get_pressed()
-        # every event gets logged below and you loop through each event, like keystrokes
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
@@ -749,30 +770,25 @@ def game():
                 bullet1.rect.x = player.rect.x + 12
                 bullet1.rect.y = player.rect.y - 25
 
+
         # debug for spawning timer, makes sure it never goes below 0 (which would stop spawning enemies)
         if spawn_timer <= 500:
             spawn_timer == 500
+
 
         # when the bullet goes out of bounds, state changes to ready and can be fired again
         if bullet1.rect.y < -32:
             bullet1.state = "ready"    
 
-        # checks if anything in bullet group collides with enemies, if so the enemy and bullet are deleted from groups
-        #hit_list = pygame.sprite.groupcollide(bullet_group, sprite_group, True, True)
 
-        # checks if sprites are in the hit_list group, if so, score +1, clears group
-
+        # collision loops, checks lists for enemies, adds score, then clears the lists
         if hit_list:
             for i in range(len(hit_list)):
                 score += 1
                 score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
                 enemy_defeat.play()
                 pygame.sprite.Group.empty(hit_list)
-        
-        # checks for collision with boss, if so, deletes boss and bullet
-        #hit_boss = pygame.sprite.groupcollide(bullet_group, boss_group, True, True)
 
-        # checks if sprites are in the hit_boss, if so, score +1, clears group
         if hit_boss:
             pygame.sprite.Group.empty(bullet_group)
             for i in range(len(hit_boss)):
@@ -782,6 +798,7 @@ def game():
                 boss_spawned = False
                 pygame.sprite.Group.empty(hit_boss)
         
+
         # checks power up collision
         pwr_list = pygame.sprite.groupcollide(player_group, pwr_up_group, False, True)
 
@@ -790,10 +807,12 @@ def game():
             choose_pwr_up()
             pwr_list.clear()
 
+
         # spawns boss every 20 score
         if score % 20 == 0 and not boss_spawned and score != 0:
             boss_group.add(Boss())
             boss_spawned = True
+
 
         # changes level every 20 score
         if score >= 20 and score < 40:
@@ -830,6 +849,7 @@ def game():
             level = 12
             level_render = level_font.render(f"Level: {str(level)}", False, (0,255,26))
 
+
         # .draw is the same as blitting, draws everything in the groups to the screen and activates the update() methods on each group
         sprite_group.draw(screen)
         sprite_group.update()
@@ -842,6 +862,7 @@ def game():
         pwr_up_group.draw(screen)
         pwr_up_group.update()
 
+
         # refreshes the screen and keeps the fps at 60
         pygame.display.flip()
         clock.tick(60)
@@ -849,18 +870,22 @@ def game():
 
 # Leaderboard Function
 def leaderboard():
+    # scene setup, basic variables, debug
     global high_scores
     screen.fill((0,0,0))
-
     background = pygame.image.load("backgrounds\\background_two.png")
     background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
-
     clock = pygame.time.Clock()
     pygame.mixer.music.pause()
+
+
+    # main loop
     running = True
     while running:
+        # sets background, gets screen center
         screen_center = screen.get_width() // 2
         screen.blit(background, (0,0))
+
 
         # leaderboard font
         score_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 20)
@@ -872,6 +897,7 @@ def leaderboard():
         back_img = pygame.image.load("UI\\UI - back.png").convert_alpha()
 
 
+        # button class
         class Button():
             def __init__(self, x, y, image, scale):
                 width = image.get_width()
@@ -928,17 +954,23 @@ def leaderboard():
         score_10 = score_font.render(f"10 - {high_scores[9]}", False, (255,255,255))
         score_10_rect = score_10.get_rect(centerx=screen_center, centery=550)
 
+
+        # event queue
         for event in pygame.event.get():
             if event.type == pygame.K_ESCAPE:
                 main_menu()
             if event.type == pygame.QUIT:
                 sys.exit(0)
         
+
+        # setting up button
         back_button = Button(20, 550, back_img, 1.0)
         back_button.draw()
         if back_button.clicked == True:
             main_menu()
 
+
+        # blitting text to screen
         screen.blit(title, title_rect)
         screen.blit(score_1, score_1_rect.topleft)
         screen.blit(score_2, score_2_rect.topleft)
@@ -950,20 +982,25 @@ def leaderboard():
         screen.blit(score_8, score_8_rect.topleft)
         screen.blit(score_9, score_9_rect.topleft)
         screen.blit(score_10, score_10_rect.topleft) 
+
+
+        # refreshes screen, sets FPS
         pygame.display.flip()
         clock.tick(60)
 
 
 # Loading Function
 def loading():
+    # scene setup, basic variables, debug
     screen.fill((0,0,0))
     screen_center = screen.get_width() // 2
     screen_mid = screen.get_height() // 2
     clock = pygame.time.Clock()
-
     background = pygame.image.load("backgrounds\\background_two.png")
     background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
 
+
+    # loading animation class
     class loading_animate(pygame.sprite.Sprite):
         # initializes the class, and info for all new objects
         def __init__(self):
@@ -984,6 +1021,8 @@ def loading():
             if self.step_index >= 90:
                 game()
     
+
+    # sprite group, setting loading object and font/text
     loading_group = pygame.sprite.Group()
     loading_group.add(loading_animate())
 
@@ -991,9 +1030,15 @@ def loading():
     loading_text = loading_font.render("Loading...", False, (255,255,255))
     loading_rect = loading_text.get_rect(centerx=screen_center,centery=screen_mid + 60)
 
+
+    # main loop
     running = True
     while running:
+        # fills screen
         screen.fill((0,0,0))
+
+
+        # event queue
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1001,11 +1046,17 @@ def loading():
             if keys[pygame.K_ESCAPE]:
                 running = False
 
+
+        # draws loading object to screen
         loading_group.draw(screen)
         loading_group.update()
 
+
+        # blits text to screen
         screen.blit(loading_text, loading_rect.topleft)
         
+
+        # refreshes screen, sets FPS
         pygame.display.flip()
         clock.tick(60)
 
