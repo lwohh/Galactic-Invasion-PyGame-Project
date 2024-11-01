@@ -30,10 +30,12 @@ Gameplay Mechanics:
 
 - At random intervals of 20-30 seconds, POWER-UPS will be dropped from the screen, and can affect various aspects of the game
 
+- The game contains a semi-persistent high-score board. as long as the game does not fully close (by pressing escape in the main menu, or clicking the X button) your top 10 scores will be persistent on the leaderboard labeled 1-10
+
 - END CONDITION: if a bomb goes below the bottom of the screen, the game will automatically end
 
 
-Keybinds:
+Key binds:
 "A"/"LEFT": Move Left
 "D"/"RIGHT": Move Right
 "SPACE": Shoot your laser
@@ -41,6 +43,4 @@ Keybinds:
 
 
 To-Do List:
-- Add persistent Scoreboard
-- Create loading screen
 - Create game end screen

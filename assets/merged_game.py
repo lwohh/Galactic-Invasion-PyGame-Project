@@ -22,9 +22,12 @@ def main_menu():
     clock = pygame.time.Clock()
     run = True
     pygame.mixer.music.pause()
+    background = pygame.image.load("background_two.png")
+    background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
+
     while run:
         screen_center = screen.get_width() // 2
-        screen.fill((0,0,0))
+        screen.blit(background, (0,0))
         # font used for main menu text
         title_font = pygame.font.Font("monogram.ttf", 60)
 
@@ -87,11 +90,6 @@ def main_menu():
                 sys.exit(0)
             if keys[pygame.K_ESCAPE]:
                 sys.exit(0)
-            if keys[pygame.K_g]:
-                pygame.mixer.music.unpause()
-                game()
-            if keys[pygame.K_i]:
-                paused()
                 
 
         pygame.display.flip()
@@ -103,9 +101,13 @@ def paused():
     clock = pygame.time.Clock()
     keep_run = True
     pygame.mixer.music.pause()
+
+    background = pygame.image.load("background_two.png")
+    background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
+
     while keep_run:
         screen_center = screen.get_width() // 2
-        screen.fill((0,0,0))
+        screen.blit(background, (0,0))
 
         # options menu font
         pause_font = pygame.font.Font("monogram.ttf", 30)
@@ -258,11 +260,27 @@ def game():
                 case 1:
                     self.speed = 8
                 case 2:
-                    self.speed = 10
+                    self.speed = 8.5
                 case 3:
-                    self.speed = 12
+                    self.speed = 9
                 case 4:
-                    self.speed = 14
+                    self.speed = 9.5
+                case 5:
+                    self.speed = 10
+                case 6:
+                    self.speed = 10.5
+                case 7:
+                    self.speed = 11
+                case 8:
+                    self.speed = 11.5
+                case 9:
+                    self.speed = 12
+                case 10:
+                    self.speed = 12.5
+                case 11:
+                    self.speed = 13
+                case 12:
+                    self.speed = 13.5
 
     # bullet class
     class bullet(pygame.sprite.Sprite):
@@ -295,10 +313,11 @@ def game():
 
             self.image = pygame.transform.scale(self.image, (5*2.75, 12*2.75))
 
-            if level == 2:
-                self.old_speed = 12
-            elif level == 3:
-                self.old_speed = 15
+            match level:
+                case 2:
+                    self.old_speed = 12
+                case 3:
+                    self.old_speed = 15
             
         def power_up(self):
             if not self.pwr_up:
@@ -413,11 +432,28 @@ def game():
                 case 1:
                     self.speed = 8
                 case 2:
-                    self.speed = 10
+                    self.speed = 8.75
                 case 3:
-                    self.speed = 12
+                    self.speed = 9.5
                 case 4:
+                    self.speed = 10.25
+                case 5:
+                    self.speed = 11
+                case 6:
+                    self.speed = 11.75
+                case 7:
+                    self.speed = 12.5
+                case 8:
+                    self.speed = 13.25
+                case 9:
                     self.speed = 14
+                case 10:
+                    self.speed = 14.75
+                case 11:
+                    self.speed = 15.5
+                case 12:
+                    self.speed = 16.25
+
 
     # power-up class
     class Powerup(pygame.sprite.Sprite):
@@ -442,6 +478,7 @@ def game():
             
             if self.pos[-1] >= 800:
                 self.kill()
+
 
     # chooses which power up to enable
     def choose_pwr_up():
@@ -482,6 +519,31 @@ def game():
     background = pygame.transform.scale(background, (640 * 1.75, 360 * 1.75))
     level_2_bg = pygame.image.load("Background_space.png")
     level_3_bg = pygame.image.load("bg_3.png")
+    level_4_bg = pygame.image.load("background_two.png")
+    level_4_bg = pygame.transform.scale(level_4_bg, (816 * 1.25, 480 * 1.25))
+    level_5_bg = pygame.image.load("background_five.png")
+    level_5_bg = pygame.transform.scale(level_5_bg, (272 * 3.75, 160 * 3.75))
+
+    level_6_bg = pygame.image.load("background_six.png")
+    level_6_bg = pygame.transform.scale(level_6_bg, (272 * 3.75, 160 * 3.75))
+
+    level_7_bg = pygame.image.load("background_seven.png")
+    level_7_bg = pygame.transform.scale(level_7_bg, (272 * 3.75, 160 * 3.75))
+
+    level_8_bg = pygame.image.load("background_eight.png")
+    level_8_bg = pygame.transform.scale(level_8_bg, (272 * 3.75, 160 * 3.75))
+
+    level_9_bg = pygame.image.load("background_nine.png")
+    level_9_bg = pygame.transform.scale(level_9_bg, (272 * 3.75, 160 * 3.75))
+
+    level_10_bg = pygame.image.load("background_ten.png")
+    level_10_bg = pygame.transform.scale(level_10_bg, (272 * 3.75, 160 * 3.75))
+
+    level_11_bg = pygame.image.load("background_eleven.png")
+    level_11_bg = pygame.transform.scale(level_11_bg, (272 * 3.75, 160 * 3.75))
+
+    level_12_bg = pygame.image.load("background_twelve.png")
+    level_12_bg = pygame.transform.scale(level_12_bg, (272 * 3.75, 160 * 3.75))
     
 
     # sounds
@@ -555,12 +617,32 @@ def game():
         # background screen color update
         screen.fill((128, 128, 128))
         # Background Image
-        if level == 1:
-            screen.blit(background, (0,0))
-        if level == 2:
-            screen.blit(level_2_bg, (0,0))
-        if level == 3:
-            screen.blit(level_3_bg, (0,0))
+        match level:
+            case 1:
+                screen.blit(background, (0,0))
+            case 2:
+                screen.blit(level_2_bg, (0,0))
+            case 3:
+                screen.blit(level_3_bg, (0,0))
+            case 4:
+                screen.blit(level_4_bg, (0,0))
+            case 5:
+                screen.blit(level_5_bg, (0,0))
+            case 6:
+               screen.blit(level_6_bg, (0,0))
+            case 7:
+                screen.blit(level_7_bg, (0,0))
+            case 8:
+                screen.blit(level_8_bg, (0,0))
+            case 9:
+                screen.blit(level_9_bg, (0,0))
+            case 10:
+                screen.blit(level_10_bg, (0,0))
+            case 11:
+                screen.blit(level_11_bg, (0,0))
+            case 12:
+                screen.blit(level_12_bg, (0,0))
+            
         screen.blit(score_render, (5,560))
         screen.blit(level_render, (650, 560))
 
@@ -680,12 +762,16 @@ def game():
 # Leaderboard Function
 def leaderboard():
     global high_scores
+
+    background = pygame.image.load("background_two.png")
+    background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
+
     clock = pygame.time.Clock()
     pygame.mixer.music.pause()
     running = True
     while running:
         screen_center = screen.get_width() // 2
-        screen.fill((0,0,0))
+        screen.blit(background, (0,0))
 
         # leaderboard font
         score_font = pygame.font.Font("monogram.ttf", 40)
@@ -784,7 +870,9 @@ def loading():
     screen_center = screen.get_width() // 2
     screen_mid = screen.get_height() // 2
     clock = pygame.time.Clock()
-    screen.fill((0,0,0))
+
+    background = pygame.image.load("background_two.png")
+    background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
 
     class loading_animate(pygame.sprite.Sprite):
         # initializes the class, and info for all new objects
@@ -815,6 +903,7 @@ def loading():
 
     running = True
     while running:
+        screen.fill((0,0,0))
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -830,5 +919,5 @@ def loading():
         pygame.display.flip()
         clock.tick(60)
 
-# begins game
+# begins game in main menu screen
 main_menu()
