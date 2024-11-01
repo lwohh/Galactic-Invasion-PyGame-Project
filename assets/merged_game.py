@@ -809,6 +809,10 @@ def loading():
     loading_group = pygame.sprite.Group()
     loading_group.add(loading_animate())
 
+    loading_font = pygame.font.Font("monogram.ttf", 48)
+    loading_text = loading_font.render("Loading...", False, (255,255,255))
+    loading_rect = loading_text.get_rect(centerx=screen_center,centery=screen_mid + 50)
+
     running = True
     while running:
         keys = pygame.key.get_pressed()
@@ -820,6 +824,8 @@ def loading():
 
         loading_group.draw(screen)
         loading_group.update()
+
+        screen.blit(loading_text, loading_rect.topleft)
         
         pygame.display.flip()
         clock.tick(60)
