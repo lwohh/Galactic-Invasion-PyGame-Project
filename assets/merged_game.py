@@ -325,7 +325,6 @@ def game():
                         high_scores.insert(i, score)
                         high_scores.pop()
                         break
-                print(high_scores)
                 leaderboard()
             
             match level:
@@ -688,8 +687,8 @@ def game():
 
     # creates a new custom event
     faster_timer_event = pygame.event.custom_type()
-    # time between event triggers (10 seconds)
-    timer_event_timer = 10000
+    # time between event triggers (20 seconds)
+    timer_event_timer = 20000
     # sets the timer for this event
     pygame.time.set_timer(faster_timer_event, timer_event_timer)
 
@@ -776,7 +775,6 @@ def game():
                 player.pwr_up = False
                 bullet1.speed = bullet1.old_speed
                 bullet1.pwr_up = False
-                print(bullet1.speed)
 
             # checks for spacebar pressed, if bullet is ready to be fired, will add bullet1 to the bullet group
             if keys[pygame.K_SPACE] and bullet1.state == "ready":
@@ -813,6 +811,7 @@ def game():
                 boss_spawned = False
                 bullet1.state = "ready"
                 pygame.sprite.Group.empty(hit_boss)
+                print(boss_spawned)
         
 
         # checks power up collision
@@ -882,8 +881,6 @@ def game():
         boss_group.update()
         pwr_up_group.draw(screen)
         pwr_up_group.update()
-
-        print(bullet1.state)
 
 
         # refreshes the screen and keeps the fps at 60
