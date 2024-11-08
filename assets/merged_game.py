@@ -658,21 +658,6 @@ def game():
 
     start_sound = pygame.mixer.Sound("02. Start Music.mp3")
     start_soun.set_volume(0.25)
- 
-    def play_background_music(24. Name Entry (2nd-5th).mp3, volume=0.5):
-
-        try:
-            # Load the music file
-            pygame.mixer.music.load("24. Name Entry (2nd-5th).mp3")
-
-            # Set volume
-            pygame.mixer.music.set_volume(volume)
-
-            # Play music in an infinite loop
-            pygame.mixer.music.play(-1)
-
-        except pygame.error as e:
-            print(f"Error loading or playing music: {e}")
 
     # sprite groups from classes for enemy, player, bullet, boss, powerup
     sprite_group = pygame.sprite.Group()
