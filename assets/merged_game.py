@@ -647,15 +647,32 @@ def game():
     pygame.mixer.music.set_volume(0.10)
     pygame.mixer.music.play(-1)
 
-    new_level = pygame.mixer.Sound("sounds\\new_level.wav")
+    new_level = pygame.mixer.Sound("20. Challenging Stage (Clear).mp3")
     new_level.set_volume(0.25)
 
     enemy_defeat = pygame.mixer.Sound("sounds\\enemy_defeat.wav")
     enemy_defeat.set_volume(0.10)
 
-    explosion_sound = pygame.mixer.Sound("sounds\\explosion_sound.wav")
+    explosion_sound = pygame.mixer.Sound("22. Miss.mp3")
     explosion_sound.set_volume(0.05)
 
+    start_sound = pygame.mixer.Sound("02. Start Music.mp3")
+    start_soun.set_volume(0.25)
+ 
+    def play_background_music(03. In-Game Ambience.mp3, volume=0.5):
+
+        try:
+            # Load the music file
+            pygame.mixer.music.load(24. Name Entry (2nd-5th).mp3)
+
+            # Set volume
+            pygame.mixer.music.set_volume(volume)
+
+            # Play music in an infinite loop
+            pygame.mixer.music.play(-1)
+
+        except pygame.error as e:
+            print(f"Error loading or playing music: {e}")
 
     # sprite groups from classes for enemy, player, bullet, boss, powerup
     sprite_group = pygame.sprite.Group()
