@@ -659,11 +659,11 @@ def game():
     start_sound = pygame.mixer.Sound("02. Start Music.mp3")
     start_soun.set_volume(0.25)
  
-    def play_background_music(03. In-Game Ambience.mp3, volume=0.5):
+    def play_background_music(24. Name Entry (2nd-5th).mp3, volume=0.5):
 
         try:
             # Load the music file
-            pygame.mixer.music.load(24. Name Entry (2nd-5th).mp3)
+            pygame.mixer.music.load("24. Name Entry (2nd-5th).mp3")
 
             # Set volume
             pygame.mixer.music.set_volume(volume)
