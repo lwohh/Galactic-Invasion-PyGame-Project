@@ -647,17 +647,17 @@ def game():
     pygame.mixer.music.set_volume(0.10)
     pygame.mixer.music.play(-1)
 
-    new_level = pygame.mixer.Sound("20. Challenging Stage (Clear).mp3")
+    new_level = pygame.mixer.Sound("sounds\\20. Challenging Stage (Clear).mp3")
     new_level.set_volume(0.25)
 
-    enemy_defeat = pygame.mixer.Sound("sounds\\enemy_defeat.wav")
+    enemy_defeat = pygame.mixer.Sound("sounds\\01. Credit Sound.mp3")
     enemy_defeat.set_volume(0.10)
 
-    explosion_sound = pygame.mixer.Sound("22. Miss.mp3")
+    explosion_sound = pygame.mixer.Sound("sounds\\22. Miss.mp3")
     explosion_sound.set_volume(0.05)
 
-    start_sound = pygame.mixer.Sound("02. Start Music.mp3")
-    start_soun.set_volume(0.25)
+    start_sound = pygame.mixer.Sound("sounds\\02. Start Music.mp3")
+    start_sound.set_volume(0.25)
 
     # sprite groups from classes for enemy, player, bullet, boss, powerup
     sprite_group = pygame.sprite.Group()
