@@ -1,4 +1,4 @@
-import pygame,random,sys
+ import pygame,random,sys
 
 # Intialize the pygame
 pygame.init()
@@ -81,7 +81,10 @@ def main_menu():
         start_button.draw()
         if start_button.clicked:
             loading()
+            start_sound = pygame.mixer.Sound("sounds\\02. Start Music.mp3")
+            start_sound.set_volume(0.25)
 
+         
         quit_button = Button(315, 425, quit_img, 1.5)
         quit_button.draw()
         if quit_button.clicked:
@@ -656,9 +659,6 @@ def game():
     explosion_sound = pygame.mixer.Sound("sounds\\22. Miss.mp3")
     explosion_sound.set_volume(0.05)
 
-    start_sound = pygame.mixer.Sound("sounds\\02. Start Music.mp3")
-    start_sound.set_volume(0.25)
-
     # sprite groups from classes for enemy, player, bullet, boss, powerup
     sprite_group = pygame.sprite.Group()
     sprite_group.add(Enemy())
@@ -784,8 +784,10 @@ def game():
                 bullet_group.add(bullet1)
                 bullet1.rect.x = player.rect.x + 12
                 bullet1.rect.y = player.rect.y - 25
+                bullet1_sound = pygame.mixer.Sound("sounds\\13. Fighter -Shot1.mp3")
+                bullet1_sound.set_volume(0.25)
 
-
+                
         # debug for spawning timer, makes sure it never goes below 0 (which would stop spawning enemies)
         if spawn_timer <= 500:
             spawn_timer == 500
