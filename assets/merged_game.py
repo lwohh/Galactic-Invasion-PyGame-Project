@@ -793,7 +793,7 @@ def game():
                 bullet1_sound.set_volume(0.25)
                 bullet1_sound.play()
              
-                if pwr_up_event == true:
+                if pwr_up_event == True:
                     bullet1_sound = pygame.mixer.Sound("sounds\\15. Fighter -Shot2.mp3")
                     bullet1_sound.set_volume(0.25)
                     bullet1_sound.play()
