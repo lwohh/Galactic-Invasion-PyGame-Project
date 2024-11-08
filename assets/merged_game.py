@@ -780,14 +780,19 @@ def game():
 
             # checks for spacebar pressed, if bullet is ready to be fired, will add bullet1 to the bullet group
             if keys[pygame.K_SPACE] and bullet1.state == "ready":
+                # Change the bullet state to 'fire' and set its initial position
                 bullet1.state = "fire"
+                bullet1.rect.x = player.rect.x + 12  # Adjust x-position relative to player
+                bullet1.rect.y = player.rect.y - 25  # Adjust y-position relative to player
+
+                # Add the bullet to the bullet group for rendering and movement
                 bullet_group.add(bullet1)
-                bullet1.rect.x = player.rect.x + 12
-                bullet1.rect.y = player.rect.y - 25
+
+                # Load and play the bullet sound
                 bullet1_sound = pygame.mixer.Sound("sounds\\13. Fighter -Shot1.mp3")
                 bullet1_sound.set_volume(0.25)
+                bullet1_sound.play()
 
-                
         # debug for spawning timer, makes sure it never goes below 0 (which would stop spawning enemies)
         if spawn_timer <= 500:
             spawn_timer == 500
