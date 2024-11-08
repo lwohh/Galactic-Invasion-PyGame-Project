@@ -80,10 +80,10 @@ def main_menu():
         start_button = Button(315, 275, start_img, 1.5)
         start_button.draw()
         if start_button.clicked:
-            loading()
             start_sound = pygame.mixer.Sound("sounds\\02. Start Music.mp3")
-            start_sound.set_volume(0.25)
-
+            start_sound.set_volume(0.05)
+            start_sound.play()
+            loading()
          
         quit_button = Button(315, 425, quit_img, 1.5)
         quit_button.draw()
