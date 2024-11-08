@@ -792,6 +792,11 @@ def game():
                 bullet1_sound = pygame.mixer.Sound("sounds\\13. Fighter -Shot1.mp3")
                 bullet1_sound.set_volume(0.25)
                 bullet1_sound.play()
+             
+                if pwr_up_event == true:
+                    bullet1_sound = pygame.mixer.Sound("sounds\\15. Fighter -Shot2.mp3")
+                    bullet1_sound.set_volume(0.25)
+                    bullet1_sound.play()
 
         # debug for spawning timer, makes sure it never goes below 0 (which would stop spawning enemies)
         if spawn_timer <= 500:
