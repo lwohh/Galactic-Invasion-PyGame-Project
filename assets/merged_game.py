@@ -643,7 +643,7 @@ def game():
     
 
     # sounds
-    pygame.mixer.music.load("sounds\\Mecha Collection.wav")
+    pygame.mixer.music.load("sounds\\Pluto - Space Invaders (PS1) Soundtrack.mp3")
     pygame.mixer.music.set_volume(0.10)
     pygame.mixer.music.play(-1)
 
