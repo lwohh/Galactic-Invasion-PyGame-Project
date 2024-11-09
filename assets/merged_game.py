@@ -240,7 +240,7 @@ def game():
 
 
     # UI
-    score = 0
+    score = 19
     score_font = pygame.font.Font("fonts\\GravityRegular5.ttf", 18)
     score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
 
@@ -509,6 +509,7 @@ def game():
                     pygame.sprite.Sprite.add(self, hit_boss)
                     pygame.sprite.Sprite.remove(self, boss_group)
                     self.rect.x = -100
+                    boss_start.play()
                     
 
                 self.image = self.explosion[self.explode_step_index // 10]
@@ -650,11 +651,20 @@ def game():
     new_level = pygame.mixer.Sound("sounds\\new_level.wav")
     new_level.set_volume(0.25)
 
-    enemy_defeat = pygame.mixer.Sound("sounds\\enemy_defeat.wav")
+    enemy_defeat = pygame.mixer.Sound("sounds\\01. Credit Sound.mp3")
     enemy_defeat.set_volume(0.10)
 
     explosion_sound = pygame.mixer.Sound("sounds\\explosion_sound.wav")
     explosion_sound.set_volume(0.05)
+
+    shoot_sound = pygame.mixer.Sound("sounds\\13. Fighter -Shot1.mp3")
+    shoot_sound.set_volume(0.10)
+
+    boss_start = pygame.mixer.Sound("sounds\\17. Challenging Stage (Start).mp3")
+    boss_start.set_volume(0.10)
+
+    boss_appear = pygame.mixer.Sound("sounds\\09. Triple Formation -Appearance.mp3")
+    boss_appear.set_volume(0.10)
 
 
     # sprite groups from classes for enemy, player, bullet, boss, powerup
@@ -782,6 +792,7 @@ def game():
                 bullet_group.add(bullet1)
                 bullet1.rect.x = player.rect.x + 12
                 bullet1.rect.y = player.rect.y - 25
+                shoot_sound.play()
 
 
         # debug for spawning timer, makes sure it never goes below 0 (which would stop spawning enemies)
@@ -807,11 +818,9 @@ def game():
             for i in range(len(hit_boss)):
                 score += 1
                 score_render = score_font.render(f"Score: {str(score)}", False, (0,255,26))
-                enemy_defeat.play()
                 boss_spawned = False
                 bullet1.state = "ready"
                 pygame.sprite.Group.empty(hit_boss)
-                print(boss_spawned)
         
 
         # checks power up collision
@@ -827,6 +836,7 @@ def game():
         if score % 20 == 0 and not boss_spawned and score != 0:
             boss_group.add(Boss())
             boss_spawned = True
+            boss_appear.play()
 
 
         # changes level every 20 score
@@ -898,6 +908,10 @@ def leaderboard():
     clock = pygame.time.Clock()
     pygame.mixer.music.pause()
 
+    lose_sound = pygame.mixer.Sound("sounds\\24. Name Entry (2nd-5th).mp3")
+    lose_sound.set_volume(0.10)
+
+    lose_sound.play(-1)
 
     # main loop
     running = True
@@ -991,6 +1005,7 @@ def leaderboard():
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
             if keys[pygame.K_TAB]:
+                lose_sound.stop()
                 main_menu()
             if event.type == pygame.QUIT:
                 sys.exit(0)
@@ -1000,6 +1015,7 @@ def leaderboard():
         back_button = Button(20, 550, back_img, 1.0)
         back_button.draw()
         if back_button.clicked == True:
+            lose_sound.stop()
             main_menu()
 
 
