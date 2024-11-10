@@ -80,7 +80,7 @@ def main_menu():
         start_button = Button(315, 275, start_img, 1.5)
         start_button.draw()
         if start_button.clicked:
-            start_sound = pygame.mixer.Sound("sounds\\02. Start Music.mp3")
+            start_sound = pygame.mixer.Sound("sounds\\Mega Man II Sound Effects - Level StartEnd Jump (mp3cut.net).mp3")
             start_sound.set_volume(0.05)
             start_sound.play()
             loading()
