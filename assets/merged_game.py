@@ -647,17 +647,17 @@ def game():
     
 
     # sounds
-    pygame.mixer.music.load("sounds\\Mecha Collection.wav")
+    pygame.mixer.music.load("sounds\\Pluto - Space Invaders (PS1) Soundtrack.mp3")
     pygame.mixer.music.set_volume(0.10)
     pygame.mixer.music.play(-1)
 
-    new_level = pygame.mixer.Sound("sounds\\new_level.wav")
+    new_level = pygame.mixer.Sound("sounds\\20. Challenging Stage (Clear).mp3")
     new_level.set_volume(0.25)
 
     enemy_defeat = pygame.mixer.Sound("sounds\\01. Credit Sound.mp3")
     enemy_defeat.set_volume(0.10)
 
-    explosion_sound = pygame.mixer.Sound("sounds\\explosion_sound.wav")
+    explosion_sound = pygame.mixer.Sound("sounds\\22. Miss.mp3")
     explosion_sound.set_volume(0.05)
 
     shoot_sound = pygame.mixer.Sound("sounds\\13. Fighter -Shot1.mp3")
