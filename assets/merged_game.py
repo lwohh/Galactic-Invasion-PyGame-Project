@@ -12,6 +12,10 @@ screen = pygame.display.set_mode((800,600))
 pygame.display.set_caption("Group 9 Project: Galactic Invasion")
 icon = pygame.image.load("UI\\game_icon.png")
 pygame.display.set_icon(icon)
+menu_sound = pygame.mixer.Sound("sounds\\Starfox 64 Starfox Theme.mp3")
+menu_sound.set_volume(0.10)
+menu_sound.play(-1)
+
 
 
 # List containing top 10 scores for current game instance, resets once game is FULLY closed
