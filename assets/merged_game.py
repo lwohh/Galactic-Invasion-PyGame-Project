@@ -12,10 +12,6 @@ screen = pygame.display.set_mode((800,600))
 pygame.display.set_caption("Group 9 Project: Galactic Invasion")
 icon = pygame.image.load("UI\\game_icon.png")
 pygame.display.set_icon(icon)
-menu_sound = pygame.mixer.Sound("sounds\\Starfox 64 Starfox Theme.mp3")
-menu_sound.set_volume(0.10)
-menu_sound.play(-1)
-
 
 
 # List containing top 10 scores for current game instance, resets once game is FULLY closed
@@ -30,6 +26,10 @@ def main_menu():
     pygame.mixer.music.pause()
     background = pygame.image.load("backgrounds\\background_two.png")
     background = pygame.transform.scale(background, (816 * 1.25, 480 * 1.25))
+    menu_sound = pygame.mixer.Sound("sounds\\Starfox 64 Starfox Theme.mp3")
+    menu_sound.set_volume(0.10)
+    menu_sound.play(-1)
+
 
 
     # main loop
@@ -87,6 +87,7 @@ def main_menu():
             start_sound = pygame.mixer.Sound("sounds\\Mega Man II Sound Effects - Level StartEnd Jump (mp3cut.net).mp3")
             start_sound.set_volume(0.05)
             start_sound.play()
+            menu_sound.stop()  
             loading()
 
         quit_button = Button(315, 425, quit_img, 1.5)
