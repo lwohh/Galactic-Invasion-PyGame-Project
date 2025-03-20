@@ -9,3 +9,4 @@ I am credited with:
   - OOP Framework transition (originally more functional before learning OOP w/ PyGame)
   - Game Mechanics (player/enemy movement, power-ups, end-conditions, etc.)
   - Level creation and traversal
+  - High-score system implementation
