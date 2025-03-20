@@ -198,7 +198,7 @@ def paused():
         instructions_five = pause_font.render("If you collide with a bomb, the game is over and you lose.", False, (255,255,255))
         five_rect = instructions_five.get_rect(centerx=screen_center, centery=145)
 
-        instructions_seven = pause_font.render("\"ESC\": Return to Main Menu", False, (255,255,255))
+        instructions_seven = pause_font.render("\"TAB\": Return to Main Menu", False, (255,255,255))
         seven_rect = instructions_seven.get_rect(centerx=screen_center, centery=350)
 
         instructions_eight = pause_font.render("Difficulty increases gradually per level.", False, (255,255,255))
